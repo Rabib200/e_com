@@ -124,7 +124,7 @@ const Home = () => {
             <CarouselContent>
               <CarouselItem>
                 <Image
-                  src="https://headgearbd.com/cdn/shop/files/Eid_Front_Banner_02_2000x2000.jpg?v=1740939035"
+                  src="/banner1.webp"
                   alt="Eid Banner"
                   width={2000}  // Define the width
                   height={2000} // Define the height
@@ -133,7 +133,7 @@ const Home = () => {
               </CarouselItem>
               <CarouselItem>
                 <Image
-                  src="https://headgearbd.com/cdn/shop/files/Eid25_Live_Now_505e7bd1-48b5-44c6-818e-1c22637e34ef_2000x2000.jpg?v=1742071498"
+                  src="/banner2.webp"
                   alt="Live Now Banner"
                   width={2000}
                   height={2000}
@@ -142,7 +142,7 @@ const Home = () => {
               </CarouselItem>
               <CarouselItem>
                 <Image
-                  src="https://headgearbd.com/cdn/shop/files/Flash_Sale_ebb57be9-9ebd-4774-b41c-e65fff2b0aff_2000x2000.jpg?v=1735555276"
+                  src="/banner3.webp"
                   alt="Flash Sale Banner"
                   width={2000}
                   height={2000}
@@ -165,7 +165,7 @@ const Home = () => {
             <CardContent>
               <div className="w-[400px]">
                 <Image
-                  src="https://headgearbd.com/cdn/shop/files/IMG_9796_1512x.jpg?v=1742009211"
+                  src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
