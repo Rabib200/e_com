@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "All Products",
-    href: "#",
+    href: "/products",
     description: "Browse all available products.",
   },
   {
@@ -66,13 +66,20 @@ const components: { title: string; href: string; description: string }[] = [
 
 const Header = () => {
   return (
-    <header className="bg-white text-black p-4 flex flex-col md:flex-row justify-between items-center">
+    <header className="fixed top-0 left-0 w-full bg-white text-black p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
+      {" "}
+      {/* Increased padding */}
       <div className="flex-shrink-0 mb-4 md:mb-0">
         <h1 className="text-2xl font-bold">Headgear BD</h1>
       </div>
       <div className="flex-grow flex justify-center">
         <NavigationMenu>
           <NavigationMenuList className="flex gap-6">
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/" className="text-black font-bold">
+                Home
+              </NavigationMenuLink>
+            </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-black">
                 Shop
@@ -138,7 +145,10 @@ const Header = () => {
                 <FaBars className="text-black text-2xl" />
               </NavigationMenuTrigger>
               <NavigationMenuContent className="w-32">
-                <NavigationMenuLink href="/signin" className="block text-center">
+                <NavigationMenuLink
+                  href="/signin"
+                  className="block text-center"
+                >
                   Sign In
                 </NavigationMenuLink>
               </NavigationMenuContent>
@@ -215,22 +225,19 @@ const Home = () => {
   return (
     <div>
       <Header />
-      <main className="p-8">
+      <main className="p-8 mt-24">
+        {" "}
+        {/* Adjusted margin-top to avoid content being hidden behind the fixed header */}
         <section className="bg-gray-100 p-6 rounded-lg text-center">
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-            }}
-          >
+          <Carousel autoPlay autoPlayInterval={5000}>
             <CarouselContent>
               <CarouselItem>
                 <Image
                   src="/banner1.webp"
                   alt="Eid Banner"
-                  width={2000} // Define the width
-                  height={2000} // Define the height
-                  priority // Add priority for LCP optimization
+                  width={2000}
+                  height={2000}
+                  priority
                 />
               </CarouselItem>
               <CarouselItem>
@@ -256,9 +263,114 @@ const Home = () => {
             <CarouselNext />
           </Carousel>
 
-          <p className="text-gray-600 text-5xl font-stretch-50% fill-amber-800">Explore the best headgear collection</p>
+          <p className="text-gray-600 text-5xl font-stretch-50% fill-amber-800">
+            Explore the best headgear collection
+          </p>
           <Button className="mt-4 hover:bg-amber-600">Shop Now</Button>
         </section>
+        <h6 className="flex justify-center mt-10">
+          <b className="text-5xl font-stretch-50% fill-amber-800">
+            TRENDING !!!
+          </b>
+        </h6>
+        <div className="flex justify-center mt-8">
+          <Carousel autoPlay autoPlayInterval={3000}>
+            <CarouselContent>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p2.webp"
+                  alt="Product 2"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p2.webp"
+                  alt="Product 2"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+              <CarouselItem className="basis-1/5">
+                <Image
+                  src="/p3.webp"
+                  alt="Product 3"
+                  width={400}
+                  height={400}
+                  priority
+                />
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
+            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
+          </Carousel>
+        </div>
         <h6 className="flex justify-center mt-10">
           <b className="text-5xl font-stretch-50% fill-amber-800">
             NEW ARRIVALS !!!
@@ -299,113 +411,10 @@ const Home = () => {
           </Card>
           {/* Repeat the same for other products */}
         </div>
-        <h6 className="flex justify-center mt-10">
-          <b className="text-5xl font-stretch-50% fill-amber-800">
-            TRENDING !!!
-          </b>
-        </h6>
-        <div className="flex justify-center mt-8">
-          <Carousel>
-            <CarouselContent>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/3">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  priority
-                />
-              </CarouselItem>
-            </CarouselContent>
-            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
-            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
-          </Carousel>
-        </div>
       </main>
-      <Footer />
     </div>
   );
 };
 
 export default Home;
+export { Header, Footer };
