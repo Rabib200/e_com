@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
+import { FaFacebook, FaTwitter, FaInstagram, FaBars } from "react-icons/fa";
 
 import {
   NavigationMenu,
@@ -130,7 +130,22 @@ const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <div className="flex-shrink-0"></div>
+      <div className="flex-shrink-0">
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>
+                <FaBars className="text-black text-2xl" />
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="w-32">
+                <NavigationMenuLink href="/signin" className="block text-center">
+                  Sign In
+                </NavigationMenuLink>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
     </header>
   );
 };
@@ -169,18 +184,27 @@ const Footer = () => {
         <p>Address: 123 Headgear St, Dhaka, Bangladesh</p>
       </div>
       <div className="flex justify-center space-x-4 mb-4">
-        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://facebook.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <FaFacebook className="text-2xl" />
         </a>
         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
           <FaTwitter className="text-2xl" />
         </a>
-        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://instagram.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <FaInstagram className="text-2xl" />
         </a>
       </div>
       <p className="mb-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
+        odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.
       </p>
       <p>&copy; {new Date().getFullYear()} Headgear BD Clone</p>
     </footer>
@@ -232,7 +256,7 @@ const Home = () => {
             <CarouselNext />
           </Carousel>
 
-          <p className="text-gray-600">Explore the best headgear collection</p>
+          <p className="text-gray-600 text-5xl font-stretch-50% fill-amber-800">Explore the best headgear collection</p>
           <Button className="mt-4 hover:bg-amber-600">Shop Now</Button>
         </section>
         <h6 className="flex justify-center mt-10">
