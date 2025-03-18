@@ -66,8 +66,8 @@ const components: { title: string; href: string; description: string }[] = [
 
 const Header = () => {
   return (
-    <header className="bg-white text-black p-4 flex justify-between items-center">
-      <div className="flex-shrink-0">
+    <header className="bg-white text-black p-4 flex flex-col md:flex-row justify-between items-center">
+      <div className="flex-shrink-0 mb-4 md:mb-0">
         <h1 className="text-2xl font-bold">Headgear BD</h1>
       </div>
       <div className="flex-grow flex justify-center">
@@ -243,16 +243,31 @@ const Home = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
           <Card className="p-4">
             <CardContent>
-              <div className="w-[400px]">
+              <div className="w-full h-64 relative">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
-                  width={400}
-                  height={400}
+                  layout="fill"
+                  objectFit="cover"
                   priority
                 />
               </div>
-
+              <CardTitle>Product 1</CardTitle>
+              <p className="text-gray-600">Best quality cap for you</p>
+              <Button className="mt-4">Buy Now</Button>
+            </CardContent>
+          </Card>
+          <Card className="p-4">
+            <CardContent>
+              <div className="w-full h-64 relative">
+                <Image
+                  src="/p1.webp"
+                  alt="Product 1"
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+              </div>
               <CardTitle>Product 1</CardTitle>
               <p className="text-gray-600">Best quality cap for you</p>
               <Button className="mt-4">Buy Now</Button>
