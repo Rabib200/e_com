@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { FaFacebook, FaTwitter, FaInstagram, FaBars, FaShoppingCart } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaShoppingCart } from "react-icons/fa";
 import {
   NavigationMenu,
   NavigationMenuContent,
