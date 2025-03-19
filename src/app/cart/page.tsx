@@ -1,12 +1,20 @@
+'use client';
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const CartPage = () => {
+  const router = useRouter();
+  const handleBillingOrder = () => {
+    console.log("Billing Order");
+    router.push("/billing");
+  };
+
   return (
-    <div className="container mx-auto p-6 mt-24">
+    <div className="container mx-auto p-6 mt-24 md:mt-32 lg:mt-40">
       <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
       
       <div className="bg-white p-4 shadow-md rounded-lg">
@@ -59,7 +67,7 @@ const CartPage = () => {
               <span>Total:</span>
               <span>$59.00</span>
             </div>
-            <Button className="mt-4 w-full">Proceed to Checkout</Button>
+            <Button className="mt-4 w-full hover:bg-amber-700" onClick={handleBillingOrder}>Proceed to Checkout</Button>
           </CardContent>
         </Card>
       </div>

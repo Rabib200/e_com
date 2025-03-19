@@ -73,15 +73,13 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white text-black p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
-      {" "}
-      {/* Increased padding */}
+    <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
       <div className="flex-shrink-0 mb-4 md:mb-0">
         <h1 className="text-2xl font-bold">Headgear BD</h1>
       </div>
       <div className="flex-grow flex justify-center">
         <NavigationMenu>
-          <NavigationMenuList className="flex gap-6">
+          <NavigationMenuList className="flex flex-wrap gap-2 md:gap-6">
             <NavigationMenuItem>
               <NavigationMenuLink href="/" className="text-black font-bold">
                 Home
@@ -159,7 +157,7 @@ const Header = () => {
             </div>
           )}
         </div>
-        <NavigationMenu>
+        {/* <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuTrigger>
@@ -175,7 +173,7 @@ const Header = () => {
               </NavigationMenuContent>
             </NavigationMenuItem>
           </NavigationMenuList>
-        </NavigationMenu>
+        </NavigationMenu> */}
       </div>
     </header>
   );
