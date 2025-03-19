@@ -65,7 +65,7 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 const Header = () => {
-  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [cartItems] = useState(3); // Example cart items count
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const toggleCart = () => {
