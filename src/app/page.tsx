@@ -1,8 +1,8 @@
-import React from "react";
+'use client';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { FaFacebook, FaTwitter, FaInstagram, FaBars } from "react-icons/fa";
-
+import { FaFacebook, FaTwitter, FaInstagram, FaBars, FaShoppingCart } from "react-icons/fa";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -65,6 +65,13 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 const Header = () => {
+  const [cartItems, setCartItems] = useState(3); // Example cart items count
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full bg-white text-black p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
       {" "}
@@ -137,7 +144,21 @@ const Header = () => {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 flex items-center space-x-4">
+        <div className="relative">
+          <FaShoppingCart className="text-black text-2xl cursor-pointer" onClick={toggleCart} />
+          {cartItems > 0 && (
+            <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              {cartItems}
+            </span>
+          )}
+          {isCartOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4">
+              <p className="text-sm">You have {cartItems} items in your cart.</p>
+              <a className="mt-2 w-full inline-block text-center bg-blue-500 text-white py-2 px-4 rounded" href="/cart">View Cart</a>
+            </div>
+          )}
+        </div>
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
