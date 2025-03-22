@@ -1,8 +1,13 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { FaFacebook, FaTwitter, FaInstagram, FaShoppingCart } from "react-icons/fa";
+import {
+  FaFacebook,
+  FaTwitter,
+  FaInstagram,
+  FaShoppingCart,
+} from "react-icons/fa";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -36,6 +41,21 @@ const components: { title: string; href: string; description: string }[] = [
     title: "Retro Jersey",
     href: "#",
     description: "Discover our most popular products.",
+  },
+  {
+    title: "T's",
+    href: "#",
+    description: "Explore our wide range of caps.",
+  },
+  {
+    title: "Polo T's",
+    href: "#",
+    description: "Find the perfect hat for any occasion.",
+  },
+  {
+    title: "Drop Shoulders",
+    href: "#",
+    description: "Stay warm with our stylish beanies.",
   },
   {
     title: "Sports Trousers",
@@ -110,17 +130,22 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 const Header = () => {
-  const [cartItems,setCartItems] = useState(0); // Example cart items count
+  const [cartItems, setCartItems] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Cart loading logic
 
   useEffect(() => {
     try {
       const getCart = JSON.parse(localStorage.getItem("cart") || "[]");
-      
+
       if (getCart && Array.isArray(getCart)) {
         // If each item has a quantity property, sum up all quantities
-        if (getCart.length > 0 && 'quantity' in getCart[0]) {
-          const totalItems = getCart.reduce((total, item) => total + (item.quantity || 1), 0);
+        if (getCart.length > 0 && "quantity" in getCart[0]) {
+          const totalItems = getCart.reduce(
+            (total, item) => total + (item.quantity || 1),
+            0
+          );
           setCartItems(totalItems);
         } else {
           // Otherwise, just count the number of items in the cart
@@ -138,214 +163,189 @@ const Header = () => {
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
-
+  
   return (
     <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
       <div className="flex-shrink-0 mb-4 md:mb-0">
         <h1 className="text-2xl font-bold">Headgear BD</h1>
       </div>
+      
+      {/* Ensure consistent viewport={false} */}
       <div className="flex-grow flex justify-center">
-        <NavigationMenu>
-          <NavigationMenuList className="flex flex-wrap gap-2 md:gap-6">
+        <NavigationMenu viewport={false} className="relative">
+          <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
             <NavigationMenuItem>
-              <NavigationMenuLink href="/" className="text-black font-bold">
+              <NavigationMenuLink 
+                href="/" 
+                className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
+              >
                 Home
               </NavigationMenuLink>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                JERSEY
-              </NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-black">JERSEY</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(0, 3).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(0, 3).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
+            {/* Ensure consistent text casing - use "T-SHIRTS" not "T-Shirts" */}
             <NavigationMenuItem>
-            <NavigationMenuLink href="/" className="text-black font-bold">
-                T-SHIRT
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href="/products" className="text-black font-bold">
-                DROP SHOULDERS
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink href="/products" className="text-black font-bold">
-                POLO
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-black">T-SHIRTS</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(3, 6).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-black">TROUSERS</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(6, 9).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-black">PANTS</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(9, 12).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
+              <NavigationMenuTrigger className="text-black">WINTER</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(12, 15).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+              <NavigationMenuTrigger className="text-black">SNEAKERS</NavigationMenuTrigger>
+              <NavigationMenuContent className="right-0 left-auto">
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(15, 18).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                TROUSERS
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(3, 6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">
-                Contact
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                  {components.slice(6).map((component) => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      href={component.href}
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
+              <NavigationMenuTrigger className="text-black">Contact</NavigationMenuTrigger>
+              <NavigationMenuContent className="right-0 left-auto">
+                <div className="w-[400px] lg:w-[500px] p-4">
+                  <ul className="grid gap-3 lg:grid-cols-2">
+                    {components.slice(18).map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
+      
+      {/* Cart icon and dropdown remain the same */}
       <div className="flex-shrink-0 flex items-center space-x-4">
         <div className="relative">
-          <FaShoppingCart className="text-black text-2xl cursor-pointer" onClick={toggleCart} />
+          <FaShoppingCart
+            className="text-black text-2xl cursor-pointer"
+            onClick={toggleCart}
+          />
           {cartItems > 0 && (
             <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
               {cartItems}
             </span>
           )}
           {isCartOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4">
-              <p className="text-sm">You have {cartItems} items in your cart.</p>
-              <a className="mt-2 w-full inline-block text-center bg-blue-500 text-white py-2 px-4 rounded" href="/cart">View Cart</a>
+            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
+              <p className="text-sm">
+                You have {cartItems} items in your cart.
+              </p>
+              <a
+                className="mt-2 w-full inline-block text-center bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700"
+                href="/cart"
+              >
+                View Cart
+              </a>
             </div>
           )}
         </div>
-        {/* <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>
-                <FaBars className="text-black text-2xl" />
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className="w-32">
-                <NavigationMenuLink
-                  href="/signin"
-                  className="block text-center"
-                >
-                  Sign In
-                </NavigationMenuLink>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu> */}
       </div>
     </header>
   );
@@ -449,7 +449,7 @@ const Home = () => {
                   priority
                 />
               </CarouselItem>
-            </CarouselContent>
+              </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>

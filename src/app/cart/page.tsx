@@ -9,23 +9,49 @@ import { CartItem } from "@/lib/types";
 
 const CartPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
+  // First effect only runs once to mark client-side rendering
   useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem("cart") || "[]") || [];
-    setCart(savedCart);
+    setIsClient(true);
   }, []);
 
+  // Load cart data only on client side
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    if (isClient) {
+      try {
+        const savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        if (Array.isArray(savedCart)) {
+          setCart(savedCart);
+        } else {
+          setCart([]);
+          console.error("Cart data is not an array:", savedCart);
+        }
+      } catch (error) {
+        console.error("Error loading cart from localStorage:", error);
+        setCart([]);
+      }
+    }
+  }, [isClient]);
+
+  // Only update localStorage when cart changes AND we're on client side
+  useEffect(() => {
+    if (isClient && cart.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+  }, [cart, isClient]);
 
   const updateQuantity = (id: string, quantity: number) => {
-    setCart(cart.map(item => item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item));
+    setCart(prevCart => 
+      prevCart.map(item => 
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+      )
+    );
   };
 
   const removeFromCart = (id: string) => {
-    setCart(cart.filter(item => item.id !== id));
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
 
   const handleBillingOrder = () => {
@@ -33,7 +59,30 @@ const CartPage = () => {
     router.push("/billing");
   };
 
-  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // Use a safer calculation for subtotal with proper type checking
+  const calculateSubtotal = () => {
+    return cart.reduce((acc, item) => {
+      // Ensure price and quantity are numbers
+      const price = typeof item.price === 'number' ? item.price : 
+                   (typeof item.price === 'string' ? parseFloat(item.price) : 0);
+      const quantity = item.quantity || 1;
+      return acc + price * quantity;
+    }, 0);
+  };
+  
+  const subtotal = calculateSubtotal();
+
+  // Show a loading state before client-side rendering
+  if (!isClient) {
+    return (
+      <div className="container mx-auto p-6 mt-24">
+        <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
+        <div className="bg-white p-4 shadow-md rounded-lg">
+          <p className="text-center py-4">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 mt-24">
@@ -44,6 +93,7 @@ const CartPage = () => {
             <TableRow>
               <TableHead>Image</TableHead>
               <TableHead>Product</TableHead>
+              <TableHead>Size</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Total</TableHead>
@@ -59,24 +109,29 @@ const CartPage = () => {
                   </div>
                 </TableCell>
                 <TableCell>{item.title}</TableCell>
-                <TableCell>${item.price}</TableCell>
+                <TableCell>{item.size || 'N/A'}</TableCell>
+                <TableCell>${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}</TableCell>
                 <TableCell>
                   <input
                     type="number"
                     className="w-16 border p-1 rounded-md text-center"
-                    value={item.quantity}
+                    value={item.quantity || 1}
                     min={1}
                     onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
                   />
                 </TableCell>
-                <TableCell>${(item.price * item.quantity).toFixed(2)}</TableCell>
+                <TableCell>
+                  ${typeof item.price === 'number' 
+                    ? (item.price * (item.quantity || 1)).toFixed(2) 
+                    : (parseFloat(item.price as string) * (item.quantity || 1)).toFixed(2)}
+                </TableCell>
                 <TableCell>
                   <Button variant="destructive" onClick={() => removeFromCart(item.id)}>Remove</Button>
                 </TableCell>
               </TableRow>
             )) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">Your cart is empty</TableCell>
+                <TableCell colSpan={7} className="text-center py-4">Your cart is empty</TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -99,7 +154,9 @@ const CartPage = () => {
                 <span>Total:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <Button className="mt-4 w-full hover:bg-amber-700" onClick={handleBillingOrder}>Proceed to Checkout</Button>
+              <Button className="mt-4 w-full bg-amber-600 hover:bg-amber-700" onClick={handleBillingOrder}>
+                Proceed to Checkout
+              </Button>
             </CardContent>
           </Card>
         </div>

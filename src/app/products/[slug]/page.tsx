@@ -8,32 +8,54 @@ import { Separator } from "@/components/ui/separator";
 import { CartItem } from "@/lib/types";
 
 const products = [
-  { id: "1", slug: "product-1", title: "Product 1", description: "Best quality cap for you", image: "/p1.webp", discount: 20, discountPrice: 20, price: 25, size: "M" },
-  { id: "2", slug: "product-2", title: "Product 2", description: "Best quality hat for you", image: "/p2.webp", discount: 30, discountPrice: 30, price: 40, size: "L" },
-  { id: "3", slug: "product-3", title: "Product 3", description: "Best quality beanie for you", image: "/p3.webp", discount: 40, discountPrice: 40, price: 50, size: "S" },
-  { id: "4", slug: "product-4", title: "Product 4", description: "Best quality scarf for you", image: "/p4.webp", price: 15, size: "M" },
+  { id: "1", slug: "product-1", title: "Product 1", description: "Best quality cap for you", image: "/p1.webp", discount: 20, discountPrice: 20, price: 25, sizes: ["S", "M", "L", "XL"] },
+  { id: "2", slug: "product-2", title: "Product 2", description: "Best quality hat for you", image: "/p2.webp", discount: 30, discountPrice: 30, price: 40, sizes: ["M", "L", "XL"] },
+  { id: "3", slug: "product-3", title: "Product 3", description: "Best quality beanie for you", image: "/p3.webp", discount: 40, discountPrice: 40, price: 50, sizes: ["S", "M"] },
+  { id: "4", slug: "product-4", title: "Product 4", description: "Best quality scarf for you", image: "/p4.webp", price: 15, sizes: ["One Size"] },
 ];
 
 export default function ProductDetails() {
   const { slug } = useParams();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(storedCart);
   }, []);
 
+  // Find the product first
+  const product = products.find((p) => p.slug === slug);
+
+  // Set the default selected size when product changes
+  useEffect(() => {
+    if (product && product.sizes && product.sizes.length > 0) {
+      setSelectedSize(product.sizes[0]);
+    }
+  }, [product]);
+
   const addToCart = () => {
-    if (!product) return;
-    const existingItem = cart.find((item) => item.id === String(product.id));
+    if (!product || !selectedSize) return;
+    
+    // Create a unique ID for the product+size combination
+    const cartItemId = `${product.id}-${selectedSize}`;
+    
+    const existingItem = cart.find((item) => item.id === cartItemId);
     let updatedCart;
+    
     if (existingItem) {
       updatedCart = cart.map((item) =>
-        item.id === String(product.id) ? { ...item, quantity: item.quantity + 1 } : item
+        item.id === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
-      updatedCart = [...cart, { ...product, id: String(product.id), quantity: 1 }];
+      updatedCart = [...cart, { 
+        ...product, 
+        id: cartItemId, 
+        size: selectedSize, 
+        quantity: 1 
+      }];
     }
+    
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
@@ -41,8 +63,6 @@ export default function ProductDetails() {
   if (!slug) {
     return <div className="text-center py-10">Loading...</div>;
   }
-
-  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     return <div className="text-center py-10">Product not found</div>;
@@ -57,7 +77,7 @@ export default function ProductDetails() {
           </div>
           <div className="flex items-center justify-between">
             <CardTitle>{product.title}</CardTitle>
-            {product.discount && <div className="badge badge-destructive">{product.discount} OFF</div>}
+            {product.discount && <div className="badge badge-destructive">{product.discount}% OFF</div>}
           </div>
           <div className="flex items-center space-x-2 text-lg font-semibold">
             {product.discountPrice ? (
@@ -70,6 +90,23 @@ export default function ProductDetails() {
             )}
           </div>
           <CardDescription>{product.description}</CardDescription>
+          
+          {/* Size Selection */}
+          <div className="space-y-2">
+            <h3 className="font-medium">Select Size</h3>
+            <div className="flex flex-wrap gap-2">
+              {product.sizes && product.sizes.map((size) => (
+                <Button 
+                  key={size}
+                  variant={selectedSize === size ? "default" : "outline"}
+                  className={`px-4 py-2 ${selectedSize === size ? 'bg-primary text-primary-foreground' : ''}`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </Button>
+              ))}
+            </div>
+          </div>
           <Separator />
           <Button className="w-full" onClick={addToCart}>Add to Cart</Button>
         </CardContent>
