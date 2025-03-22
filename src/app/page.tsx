@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { FaFacebook, FaTwitter, FaInstagram, FaShoppingCart } from "react-icons/fa";
@@ -23,34 +23,79 @@ import { cn } from "@/lib/utils";
 
 const components: { title: string; href: string; description: string }[] = [
   {
-    title: "All Products",
+    title: "Club Jersey",
     href: "/products",
     description: "Browse all available products.",
   },
   {
-    title: "New Arrivals",
+    title: "National Team Jersey",
     href: "#",
     description: "Check out the latest additions to our collection.",
   },
   {
-    title: "Best Sellers",
+    title: "Retro Jersey",
     href: "#",
     description: "Discover our most popular products.",
   },
   {
-    title: "Caps",
+    title: "Sports Trousers",
     href: "#",
     description: "Explore our wide range of caps.",
   },
   {
-    title: "Hats",
+    title: "Baggy Trousers",
     href: "#",
     description: "Find the perfect hat for any occasion.",
   },
   {
-    title: "Beanies",
+    title: "Shorts",
     href: "#",
     description: "Stay warm with our stylish beanies.",
+  },
+  {
+    title: "Twill Pants",
+    href: "#",
+    description: "Protect yourself from the sun with our visors.",
+  },
+  {
+    title: "Denim Pants",
+    href: "#",
+    description: "Get the latest headgear accessories.",
+  },
+  {
+    title: "Cargo Pants",
+    href: "#",
+    description: "Shop our collection of caps for kids.",
+  },
+  {
+    title: "Sweat Shirt",
+    href: "#",
+    description: "Find the perfect hat for any occasion.",
+  },
+  {
+    title: "Hoodie",
+    href: "#",
+    description: "Stay warm with our stylish beanies.",
+  },
+  {
+    title: "Jacket",
+    href: "#",
+    description: "Protect yourself from the sun with our visors.",
+  },
+  {
+    title: "Adidas",
+    href: "#",
+    description: "Get the latest headgear accessories.",
+  },
+  {
+    title: "Nike",
+    href: "#",
+    description: "Shop our collection of caps for kids.",
+  },
+  {
+    title: "Tracksuit",
+    href: "#",
+    description: "Shop our collection of caps for kids.",
   },
   {
     title: "Customer Support",
@@ -65,8 +110,30 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 const Header = () => {
-  const [cartItems] = useState(3); // Example cart items count
+  const [cartItems,setCartItems] = useState(0); // Example cart items count
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const getCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      
+      if (getCart && Array.isArray(getCart)) {
+        // If each item has a quantity property, sum up all quantities
+        if (getCart.length > 0 && 'quantity' in getCart[0]) {
+          const totalItems = getCart.reduce((total, item) => total + (item.quantity || 1), 0);
+          setCartItems(totalItems);
+        } else {
+          // Otherwise, just count the number of items in the cart
+          setCartItems(getCart.length);
+        }
+      } else {
+        setCartItems(0);
+      }
+    } catch (error) {
+      console.error("Error parsing cart from localStorage:", error);
+      setCartItems(0);
+    }
+  }, []);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -87,7 +154,7 @@ const Header = () => {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuTrigger className="text-black">
-                Shop
+                JERSEY
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -104,8 +171,113 @@ const Header = () => {
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuItem>
+            <NavigationMenuLink href="/" className="text-black font-bold">
+                T-SHIRT
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/products" className="text-black font-bold">
+                DROP SHOULDERS
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/products" className="text-black font-bold">
+                POLO
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
               <NavigationMenuTrigger className="text-black">
-                Categories
+                TROUSERS
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  {components.slice(3, 6).map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-black">
+                TROUSERS
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  {components.slice(3, 6).map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-black">
+                TROUSERS
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  {components.slice(3, 6).map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-black">
+                TROUSERS
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  {components.slice(3, 6).map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-black">
+                TROUSERS
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                  {components.slice(3, 6).map((component) => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      href={component.href}
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="text-black">
+                TROUSERS
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
