@@ -1,6 +1,5 @@
 'use client';
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -12,25 +11,53 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { UUID } from "crypto";
+import { axiosInstance } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
-const products = [
-  { id: 1, title: "Product 1", description: "Best quality cap for you", image: "/p1.webp", href: "/products/product-1" },
-  { id: 2, title: "Product 2", description: "Best quality hat for you", image: "/p2.webp", href: "/products/product-2" },
-  { id: 3, title: "Product 3", description: "Best quality beanie for you", image: "/p3.webp", href: "/products/product-3" },
-  // Add more products as needed
-];
+interface Product {
+  id: UUID;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  discount?: number;
+  discountPrice?: number;
+  price: number;
+  sizes: string[];
+}
 
 const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
   const productsPerPage = 6;
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get('/products');
+        setProducts(response.data);
+      }catch(error){
+        console.error("Error fetching products:", error);
+      }
+    }
+    fetchProducts();
+  }, []);
 
   // Calculate the current products to display
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
 
+
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  function handleViewMore(slug: string): void {
+    console.log("View more clicked", slug);
+    router.push(`/products/${slug}`);
+  }
 
   return (
     <main className="p-8 mt-24">
@@ -44,9 +71,9 @@ const Products = () => {
               </div>
               <CardTitle>{product.title}</CardTitle>
               <p className="text-gray-600">{product.description}</p>
-              <Link href={product.href} passHref>
-                <Button className="mt-4">View More</Button>
-              </Link>
+              
+                <Button className="mt-4" onClick={() => handleViewMore(product.slug)}>View More</Button>
+              
             </CardContent>
           </Card>
         ))}

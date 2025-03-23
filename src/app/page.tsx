@@ -25,6 +25,9 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image"; // Import Image from next/image
 import { cn } from "@/lib/utils";
+import { axiosInstance } from "@/lib/supabase";
+import { UUID } from "crypto";
+import { useRouter } from "next/navigation";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -132,6 +135,7 @@ const components: { title: string; href: string; description: string }[] = [
 const Header = () => {
   const [cartItems, setCartItems] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  
 
   // Cart loading logic
 
@@ -159,6 +163,8 @@ const Header = () => {
       setCartItems(0);
     }
   }, []);
+
+
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -412,7 +418,36 @@ const Footer = () => {
   );
 };
 
+interface Product {
+  id: UUID;
+  image: string;
+  title: string;
+  description: string;
+  slug: string;
+}
+
 const Home = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get('/products');
+        setProducts(response.data);
+      }catch(error){
+        console.error("Error fetching products:", error);
+      }
+    }
+    fetchProducts();
+  }, []);
+  function handleBuyNow(slug: string) {
+    console.log("Buy Now Clicked for product:", slug);
+    router.push(`/products/${slug}`);
+  } 
+    
+  
+
   return (
     <div>
       <Header />
@@ -567,40 +602,28 @@ const Home = () => {
             NEW ARRIVALS !!!
           </b>
         </h6>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
-          <Card className="p-4">
-            <CardContent>
-              <div className="w-full h-64 relative">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  layout="fill"
-                  objectFit="cover"
-                  priority
-                />
-              </div>
-              <CardTitle>Product 1</CardTitle>
-              <p className="text-gray-600">Best quality cap for you</p>
-              <Button className="mt-4">Buy Now</Button>
-            </CardContent>
-          </Card>
-          <Card className="p-4">
-            <CardContent>
-              <div className="w-full h-64 relative">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  layout="fill"
-                  objectFit="cover"
-                  priority
-                />
-              </div>
-              <CardTitle>Product 1</CardTitle>
-              <p className="text-gray-600">Best quality cap for you</p>
-              <Button className="mt-4">Buy Now</Button>
-            </CardContent>
-          </Card>
-          {/* Repeat the same for other products */}
+          {products.map((product, index) => (
+            <Card key={index} className="p-4">
+              <CardContent>
+                <div className="w-full h-64 relative">
+                  <Image
+                    src={product.image || "/placeholder.webp"}
+                    alt={product.title || "Product"}
+                    layout="fill"
+                    objectFit="cover"
+                    priority
+                  />
+                </div>
+                <CardTitle>{product.title || "Product"}</CardTitle>
+                <p className="text-gray-600">{product.description || "Description"}</p>
+                <Button className="mt-4" onClick={() => handleBuyNow(product.slug)}>Buy Now</Button>
+              </CardContent>
+            </Card>
+          ))}
+          
+          
         </div>
       </main>
     </div>

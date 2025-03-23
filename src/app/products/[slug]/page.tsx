@@ -6,43 +6,64 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { CartItem } from "@/lib/types";
+import { toast } from "sonner";
+import { axiosInstance } from "@/lib/supabase";
+import { UUID } from "crypto";
 
-const products = [
-  { id: "1", slug: "product-1", title: "Product 1", description: "Best quality cap for you", image: "/p1.webp", discount: 20, discountPrice: 20, price: 25, sizes: ["S", "M", "L", "XL"] },
-  { id: "2", slug: "product-2", title: "Product 2", description: "Best quality hat for you", image: "/p2.webp", discount: 30, discountPrice: 30, price: 40, sizes: ["M", "L", "XL"] },
-  { id: "3", slug: "product-3", title: "Product 3", description: "Best quality beanie for you", image: "/p3.webp", discount: 40, discountPrice: 40, price: 50, sizes: ["S", "M"] },
-  { id: "4", slug: "product-4", title: "Product 4", description: "Best quality scarf for you", image: "/p4.webp", price: 15, sizes: ["One Size"] },
-];
+interface Product {
+  id: UUID;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  discount?: number;
+  discountPrice?: number;
+  price: number;
+  sizes: string[];
+}
 
 export default function ProductDetails() {
   const { slug } = useParams();
+  const [product, setProduct] = useState<Product>();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
 
+  // Load cart from localStorage
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     setCart(storedCart);
   }, []);
 
-  // Find the product first
-  const product = products.find((p) => p.slug === slug);
-
-  // Set the default selected size when product changes
+  // Fetch product by slug using Axios
   useEffect(() => {
-    if (product && product.sizes && product.sizes.length > 0) {
-      setSelectedSize(product.sizes[0]);
-    }
-  }, [product]);
+    const fetchProduct = async () => {
+      if (!slug) return;
+
+      try {
+        const { data } = await axiosInstance.get(`/products?slug=eq.${slug}&select=*`);
+        if (data.length > 0) {
+          setProduct(data[0]); // Set first matching product
+          if (data[0].sizes && data[0].sizes.length > 0) {
+            setSelectedSize(data[0].sizes[0]); // Set default size
+          }
+        } else {
+          console.error("Product not found");
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
 
   const addToCart = () => {
     if (!product || !selectedSize) return;
-    
-    // Create a unique ID for the product+size combination
+
     const cartItemId = `${product.id}-${selectedSize}`;
-    
     const existingItem = cart.find((item) => item.id === cartItemId);
-    let updatedCart;
     
+    let updatedCart;
     if (existingItem) {
       updatedCart = cart.map((item) =>
         item.id === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
@@ -55,17 +76,14 @@ export default function ProductDetails() {
         quantity: 1 
       }];
     }
-    
+
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
+    toast("Product added to cart");
   };
 
-  if (!slug) {
-    return <div className="text-center py-10">Loading...</div>;
-  }
-
   if (!product) {
-    return <div className="text-center py-10">Product not found</div>;
+    return <div className="text-center py-10">Loading...</div>;
   }
 
   return (

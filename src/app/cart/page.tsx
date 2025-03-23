@@ -12,12 +12,12 @@ const CartPage = () => {
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
-  // First effect only runs once to mark client-side rendering
+  // Ensure client-side rendering
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  // Load cart data only on client side
+  // Load cart from localStorage
   useEffect(() => {
     if (isClient) {
       try {
@@ -35,23 +35,27 @@ const CartPage = () => {
     }
   }, [isClient]);
 
-  // Only update localStorage when cart changes AND we're on client side
+  // Sync cart state with localStorage
   useEffect(() => {
-    if (isClient && cart.length > 0) {
+    if (isClient) {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
   }, [cart, isClient]);
 
   const updateQuantity = (id: string, quantity: number) => {
-    setCart(prevCart => 
-      prevCart.map(item => 
+    setCart((prevCart) => 
+      prevCart.map((item) =>
         item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
       )
     );
   };
 
   const removeFromCart = (id: string) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== id));
+    setCart((prevCart) => {
+      const updatedCart = prevCart.filter((item) => item.id !== id);
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Ensure localStorage updates immediately
+      return updatedCart;
+    });
   };
 
   const handleBillingOrder = () => {
@@ -59,20 +63,15 @@ const CartPage = () => {
     router.push("/billing");
   };
 
-  // Use a safer calculation for subtotal with proper type checking
   const calculateSubtotal = () => {
     return cart.reduce((acc, item) => {
-      // Ensure price and quantity are numbers
-      const price = typeof item.price === 'number' ? item.price : 
-                   (typeof item.price === 'string' ? parseFloat(item.price) : 0);
-      const quantity = item.quantity || 1;
-      return acc + price * quantity;
+      const price = typeof item.price === "number" ? item.price : parseFloat(item.price as string);
+      return acc + price * (item.quantity || 1);
     }, 0);
   };
   
   const subtotal = calculateSubtotal();
 
-  // Show a loading state before client-side rendering
   if (!isClient) {
     return (
       <div className="container mx-auto p-6 mt-24">
@@ -101,7 +100,7 @@ const CartPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cart.length > 0 ? cart.map(item => (
+            {cart.length > 0 ? cart.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>
                   <div className="w-16 h-16 relative">
@@ -109,8 +108,8 @@ const CartPage = () => {
                   </div>
                 </TableCell>
                 <TableCell>{item.title}</TableCell>
-                <TableCell>{item.size || 'N/A'}</TableCell>
-                <TableCell>${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}</TableCell>
+                <TableCell>{item.size || "N/A"}</TableCell>
+                <TableCell>${item.price.toFixed(2)}</TableCell>
                 <TableCell>
                   <input
                     type="number"
@@ -120,11 +119,7 @@ const CartPage = () => {
                     onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
                   />
                 </TableCell>
-                <TableCell>
-                  ${typeof item.price === 'number' 
-                    ? (item.price * (item.quantity || 1)).toFixed(2) 
-                    : (parseFloat(item.price as string) * (item.quantity || 1)).toFixed(2)}
-                </TableCell>
+                <TableCell>${(item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
                 <TableCell>
                   <Button variant="destructive" onClick={() => removeFromCart(item.id)}>Remove</Button>
                 </TableCell>
@@ -137,6 +132,7 @@ const CartPage = () => {
           </TableBody>
         </Table>
       </div>
+
       {cart.length > 0 && (
         <div className="mt-6 flex justify-end">
           <Card className="w-full max-w-sm p-4 shadow-md">
