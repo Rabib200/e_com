@@ -28,8 +28,9 @@ import { cn } from "@/lib/utils";
 import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
-import { Link, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerDescription } from "@/components/ui/drawer";
+import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const components: { title: string; href: string; description: string }[] = [
@@ -205,22 +206,17 @@ const Header = () => {
                 </DrawerDescription>
               </DrawerHeader>
               <div className="px-4 py-2 overflow-y-auto">
-                <nav className="space-y-2">
+                <nav className="space-y-4">
+                  <Link 
+                    href="/" 
+                    className="block py-3 px-4 text-lg font-medium text-black hover:bg-gray-100 rounded-md border border-gray-200"
+                  >
+                    Home
+                  </Link>
+                  
                   
                   <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="home">
-                      <AccordionTrigger className="py-2 px-3">Home</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="pl-4 space-y-2">
-                          <Link 
-                            href="/" 
-                            className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
-                          >
-                            Home
-                          </Link>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
+                
                     <AccordionItem value="jersey">
                       <AccordionTrigger className="py-2 px-3">JERSEY</AccordionTrigger>
                       <AccordionContent>
@@ -702,16 +698,6 @@ const Home = () => {
                 <Image
                   src="/p2.webp"
                   alt="Product 2"
-                  width={400}
-                  height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
                   width={400}
                   height={400}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
