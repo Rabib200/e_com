@@ -206,14 +206,21 @@ const Header = () => {
               </DrawerHeader>
               <div className="px-4 py-2 overflow-y-auto">
                 <nav className="space-y-2">
-                  <Link 
-                    href="/" 
-                    className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
-                  >
-                    Home
-                  </Link>
                   
                   <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="home">
+                      <AccordionTrigger className="py-2 px-3">Home</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          <Link 
+                            href="/" 
+                            className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                          >
+                            Home
+                          </Link>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
                     <AccordionItem value="jersey">
                       <AccordionTrigger className="py-2 px-3">JERSEY</AccordionTrigger>
                       <AccordionContent>

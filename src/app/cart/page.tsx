@@ -109,7 +109,7 @@ const CartPage = () => {
                 </TableCell>
                 <TableCell>{item.title}</TableCell>
                 <TableCell>{item.size || "N/A"}</TableCell>
-                <TableCell>${item.price.toFixed(2)}</TableCell>
+                <TableCell>${item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
                 <TableCell>
                   <input
                     type="number"
@@ -119,7 +119,7 @@ const CartPage = () => {
                     onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
                   />
                 </TableCell>
-                <TableCell>${(item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
+                <TableCell>${item.discountPrice ? (item.discountPrice * (item.quantity)) : (item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
                 <TableCell>
                   <Button variant="destructive" onClick={() => removeFromCart(item.id)}>Remove</Button>
                 </TableCell>
