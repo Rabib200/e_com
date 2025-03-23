@@ -28,6 +28,9 @@ import { cn } from "@/lib/utils";
 import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
+import { Link, Menu } from "lucide-react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerDescription } from "@/components/ui/drawer";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -132,9 +135,7 @@ const Header = () => {
   const [cartItems, setCartItems] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
-
   // Cart loading logic
-
   useEffect(() => {
     try {
       const getCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -160,182 +161,186 @@ const Header = () => {
     }
   }, []);
 
-
-
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
   
   return (
-    <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 flex flex-col md:flex-row justify-between items-center z-50 shadow-md">
-      <div className="flex-shrink-0 mb-4 md:mb-0">
-        <h1 className="text-2xl font-bold">Headgear BD</h1>
-      </div>
-      
-      {/* Ensure consistent viewport={false} */}
-      <div className="flex-grow flex justify-center">
-        <NavigationMenu viewport={false} className="relative">
-          <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
-            <NavigationMenuItem>
-              <NavigationMenuLink 
-                href="/" 
-                className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
-              >
-                Home
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">JERSEY</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(0, 3).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            {/* Ensure consistent text casing - use "T-SHIRTS" not "T-Shirts" */}
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">T-SHIRTS</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(3, 6).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">TROUSERS</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(6, 9).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">PANTS</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(9, 12).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">WINTER</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(12, 15).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">SNEAKERS</NavigationMenuTrigger>
-              <NavigationMenuContent className="right-0 left-auto">
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(15, 18).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-black">Contact</NavigationMenuTrigger>
-              <NavigationMenuContent className="right-0 left-auto">
-                <div className="w-[400px] lg:w-[500px] p-4">
-                  <ul className="grid gap-3 lg:grid-cols-2">
-                    {components.slice(18).map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-      </div>
-      
-      {/* Cart icon and dropdown remain the same */}
-      <div className="flex-shrink-0 flex items-center space-x-4">
-        <div className="relative">
-          <FaShoppingCart
-            className="text-black text-2xl cursor-pointer"
-            onClick={toggleCart}
-          />
-          {cartItems > 0 && (
-            <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-              {cartItems}
-            </span>
-          )}
+    <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 z-50 shadow-md">
+      <div className="flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex-shrink-0">
+          <h1 className="text-2xl font-bold">Headgear BD</h1>
+        </div>
+        
+        {/* Mobile Navigation */}
+        <div className="flex items-center gap-4 md:hidden">
+          {/* Cart Icon for Mobile */}
+          <div className="relative">
+            <FaShoppingCart
+              className="text-black text-2xl cursor-pointer"
+              onClick={toggleCart}
+            />
+            {cartItems > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cartItems}
+              </span>
+            )}
+          </div>
+          
+          {/* Hamburger Menu */}
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[85vh]">
+              <DrawerHeader className="border-b">
+                <DrawerTitle>Menu</DrawerTitle>
+                {/* Add this DrawerDescription to fix the accessibility warning */}
+                <DrawerDescription>
+                  Browse our navigation menu
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className="px-4 py-2 overflow-y-auto">
+                <nav className="space-y-2">
+                  <Link 
+                    href="/" 
+                    className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
+                  >
+                    Home
+                  </Link>
+                  
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="jersey">
+                      <AccordionTrigger className="py-2 px-3">JERSEY</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(0, 3).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="tshirts">
+                      <AccordionTrigger className="py-2 px-3">T-SHIRTS</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(3, 6).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="trousers">
+                      <AccordionTrigger className="py-2 px-3">TROUSERS</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(6, 9).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="pants">
+                      <AccordionTrigger className="py-2 px-3">PANTS</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(9, 12).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="winter">
+                      <AccordionTrigger className="py-2 px-3">WINTER</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(12, 15).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="sneakers">
+                      <AccordionTrigger className="py-2 px-3">SNEAKERS</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(15, 18).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="contact">
+                      <AccordionTrigger className="py-2 px-3">Contact</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pl-4 space-y-2">
+                          {components.slice(18).map((component) => (
+                            <a 
+                              key={component.title}
+                              href={component.href}
+                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                            >
+                              {component.title}
+                            </a>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </nav>
+              </div>
+            </DrawerContent>
+          </Drawer>
+          
+          {/* Mobile cart dropdown */}
           {isCartOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
+            <div className="absolute top-16 right-4 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
               <p className="text-sm">
                 You have {cartItems} items in your cart.
               </p>
@@ -347,6 +352,183 @@ const Header = () => {
               </a>
             </div>
           )}
+        </div>
+        
+        {/* Desktop Navigation - Hidden on Mobile */}
+        <div className="hidden md:flex flex-grow justify-center">
+          <NavigationMenu viewport={false} className="relative">
+            <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
+              <NavigationMenuItem>
+                <NavigationMenuLink 
+                  href="/" 
+                  className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
+                >
+                  Home
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">JERSEY</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(0, 3).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">T-SHIRTS</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(3, 6).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">TROUSERS</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(6, 9).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">PANTS</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(9, 12).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">WINTER</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(12, 15).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">SNEAKERS</NavigationMenuTrigger>
+                <NavigationMenuContent className="right-0 left-auto">
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(15, 18).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-black">Contact</NavigationMenuTrigger>
+                <NavigationMenuContent className="right-0 left-auto">
+                  <div className="w-[400px] lg:w-[500px] p-4">
+                    <ul className="grid gap-3 lg:grid-cols-2">
+                      {components.slice(18).map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+        
+        {/* Desktop Cart - Hidden on Mobile */}
+        <div className="hidden md:block">
+          <div className="relative">
+            <FaShoppingCart
+              className="text-black text-2xl cursor-pointer"
+              onClick={toggleCart}
+            />
+            {cartItems > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cartItems}
+              </span>
+            )}
+            {isCartOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
+                <p className="text-sm">
+                  You have {cartItems} items in your cart.
+                </p>
+                <a
+                  className="mt-2 w-full inline-block text-center bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700"
+                  href="/cart"
+                >
+                  View Cart
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
@@ -505,6 +687,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -514,6 +697,7 @@ const Home = () => {
                   alt="Product 2"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -523,6 +707,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -532,6 +717,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -541,6 +727,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -550,6 +737,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -559,6 +747,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -568,6 +757,7 @@ const Home = () => {
                   alt="Product 1"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -577,6 +767,7 @@ const Home = () => {
                   alt="Product 2"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -586,6 +777,7 @@ const Home = () => {
                   alt="Product 3"
                   width={400}
                   height={400}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority
                 />
               </CarouselItem>
@@ -610,6 +802,7 @@ const Home = () => {
                     alt={product.title || "Product"}
                     layout="fill"
                     objectFit="cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     priority
                   />
                 </div>
