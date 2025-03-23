@@ -32,94 +32,90 @@ import { useRouter } from "next/navigation";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Club Jersey",
-    href: "/products",
+    href: '/products?category=club-jersey',
     description: "Browse all available products.",
   },
   {
     title: "National Team Jersey",
-    href: "#",
+    href: "/products?category=national-team-jersey",
     description: "Check out the latest additions to our collection.",
   },
   {
     title: "Retro Jersey",
-    href: "#",
+    href: "/products?category=retro-jersey",
     description: "Discover our most popular products.",
   },
   {
     title: "T's",
-    href: "#",
+    href: "/products?category=T-shirt",
     description: "Explore our wide range of caps.",
   },
   {
     title: "Polo T's",
-    href: "#",
+    href: "/products?category=polo",
     description: "Find the perfect hat for any occasion.",
   },
   {
     title: "Drop Shoulders",
-    href: "#",
+    href: "/products?category=drop-shoulder",
     description: "Stay warm with our stylish beanies.",
   },
   {
     title: "Sports Trousers",
-    href: "#",
+    href: "/products?category=sports-trouser",
     description: "Explore our wide range of caps.",
   },
   {
     title: "Baggy Trousers",
-    href: "#",
+    href: "/products?category=baggy-trouser",
     description: "Find the perfect hat for any occasion.",
   },
   {
     title: "Shorts",
-    href: "#",
+    href: "/products?category=shorts",
     description: "Stay warm with our stylish beanies.",
   },
   {
     title: "Twill Pants",
-    href: "#",
+    href: "/products?category=twill-pants",
     description: "Protect yourself from the sun with our visors.",
   },
   {
     title: "Denim Pants",
-    href: "#",
+    href: "/products?category=denim-pants",
     description: "Get the latest headgear accessories.",
   },
   {
     title: "Cargo Pants",
-    href: "#",
+    href: "/products?category=cargo-pants",
     description: "Shop our collection of caps for kids.",
   },
   {
     title: "Sweat Shirt",
-    href: "#",
+    href: "/products?category=sweat-shirt",
     description: "Find the perfect hat for any occasion.",
   },
   {
     title: "Hoodie",
-    href: "#",
+    href: "/products?category=hoodie",
     description: "Stay warm with our stylish beanies.",
   },
   {
     title: "Jacket",
-    href: "#",
+    href: "/products?category=jacket",
     description: "Protect yourself from the sun with our visors.",
   },
   {
     title: "Adidas",
-    href: "#",
+    href: "/products?category=adidas",
     description: "Get the latest headgear accessories.",
   },
   {
     title: "Nike",
-    href: "#",
+    href: "/products?category=nike",
     description: "Shop our collection of caps for kids.",
   },
-  {
-    title: "Tracksuit",
-    href: "#",
-    description: "Shop our collection of caps for kids.",
-  },
+ 
   {
     title: "Customer Support",
     href: "#",
@@ -424,6 +420,7 @@ interface Product {
   title: string;
   description: string;
   slug: string;
+  category: string;
 }
 
 const Home = () => {

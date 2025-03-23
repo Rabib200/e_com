@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/pagination";
 import { UUID } from "crypto";
 import { axiosInstance } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import {  useRouter, useSearchParams } from "next/navigation";
 
 interface Product {
   id: UUID;
@@ -24,10 +24,13 @@ interface Product {
   discount?: number;
   discountPrice?: number;
   price: number;
+  cagtegory: string;
   sizes: string[];
 }
 
 const Products = () => {
+  const searchParams = useSearchParams();
+  const category = searchParams.get("category") || "";
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const productsPerPage = 6;
@@ -36,20 +39,24 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get('/products');
+        const response = await axiosInstance.get(
+          `/products?category=eq.${category}&select=*`
+        );
         setProducts(response.data);
-      }catch(error){
+      } catch (error) {
         console.error("Error fetching products:", error);
       }
-    }
+    };
     fetchProducts();
-  }, []);
+  }, [category]);
 
   // Calculate the current products to display
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
   // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -67,13 +74,23 @@ const Products = () => {
           <Card key={product.id} className="p-4">
             <CardContent>
               <div className="w-full h-64 relative">
-                <Image src={product.image} alt={product.title} fill style={{ objectFit: "cover" }} priority />
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  priority
+                />
               </div>
               <CardTitle>{product.title}</CardTitle>
               <p className="text-gray-600">{product.description}</p>
-              
-                <Button className="mt-4" onClick={() => handleViewMore(product.slug)}>View More</Button>
-              
+
+              <Button
+                className="mt-4"
+                onClick={() => handleViewMore(product.slug)}
+              >
+                View More
+              </Button>
             </CardContent>
           </Card>
         ))}
@@ -83,18 +100,24 @@ const Products = () => {
           <PaginationPrevious
             onClick={() => currentPage > 1 && paginate(currentPage - 1)}
           />
-          {Array.from({ length: Math.ceil(products.length / productsPerPage) }, (_, i) => (
-            <PaginationItem key={i}>
-              <PaginationLink
-                isActive={currentPage === i + 1}
-                onClick={() => paginate(i + 1)}
-              >
-                {i + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
+          {Array.from(
+            { length: Math.ceil(products.length / productsPerPage) },
+            (_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  isActive={currentPage === i + 1}
+                  onClick={() => paginate(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            )
+          )}
           <PaginationNext
-            onClick={() => currentPage < Math.ceil(products.length / productsPerPage) && paginate(currentPage + 1)}
+            onClick={() =>
+              currentPage < Math.ceil(products.length / productsPerPage) &&
+              paginate(currentPage + 1)
+            }
           />
         </PaginationContent>
       </Pagination>
