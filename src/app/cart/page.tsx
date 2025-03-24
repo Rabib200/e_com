@@ -65,7 +65,7 @@ const CartPage = () => {
 
   const calculateSubtotal = () => {
     return cart.reduce((acc, item) => {
-      const price = typeof item.price === "number" ? item.price : parseFloat(item.price as string);
+      const price = item.discountPrice ? item.discountPrice : (typeof item.price === "number" ? item.price : parseFloat(item.price as string));
       return acc + price * (item.quantity || 1);
     }, 0);
   };
