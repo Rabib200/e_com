@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -28,6 +28,7 @@ interface Product {
 }
 
 export default function ProductDetails() {
+  const router = useRouter();
   const { slug } = useParams();
   const [product, setProduct] = useState<Product>();
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -89,7 +90,16 @@ export default function ProductDetails() {
 
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    toast("Product added to cart");
+    
+    // Enhanced toast with action button
+    toast("Product added to cart", {
+      description: `${product.title} (${selectedSize}) added to your shopping cart.`,
+      action: {
+        label: "View Cart",
+        onClick: () => router.push("/cart")
+      },
+      duration: 5000 // Show for 5 seconds
+    });
   };
 
   if (!product) {

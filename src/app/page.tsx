@@ -335,7 +335,7 @@ const Header = () => {
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
-                          {components.slice(15, 18).map((component) => (
+                          {components.slice(15, 17).map((component) => (
                             <a
                               key={component.title}
                               href={component.href}
@@ -354,7 +354,7 @@ const Header = () => {
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
-                          {components.slice(18).map((component) => (
+                          {components.slice(17).map((component) => (
                             <a
                               key={component.title}
                               href={component.href}

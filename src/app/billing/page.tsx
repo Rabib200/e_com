@@ -37,20 +37,37 @@ const BillingPage = () => {
     }));
   };
 
-  // Convert price string to number if needed
-  const getNumericPrice = (price: string | number): number => {
-    if (typeof price === 'string') {
-      // Remove currency symbol and convert to number
-      return parseFloat(price.replace(/[^0-9.-]+/g, ''));
+  // Update the getNumericPrice function to properly handle different price formats
+  const getNumericPrice = (price: string | number | undefined): number => {
+    if (price === undefined) {
+      return 0;
     }
+    
+    if (typeof price === 'string') {
+      // If price is a string with $ symbol (e.g., "$10.99")
+      if (price.startsWith('$')) {
+        return parseFloat(price.substring(1));
+      }
+      // Handle other string formats
+      return parseFloat(price.replace(/[^0-9.-]+/g, '')) || 0;
+    }
+    
+    // If price is already a number
     return typeof price === 'number' ? price : 0;
   };
 
+  // Update the calculateItemTotal function to better handle undefined prices
   const calculateItemTotal = (item: CartItem): number => {
     const price = getNumericPrice(item.price);
-    const discountPrice = item.discountPrice !== undefined ? getNumericPrice(item.discountPrice) : undefined;
-    const effectivePrice = discountPrice !== undefined ? discountPrice : price;
-    return effectivePrice * item.quantity;
+    const discountPrice = item.discountPrice !== null 
+      ? getNumericPrice(item.discountPrice) 
+      : null;
+      
+    // Use discount price if available, otherwise use regular price
+    const effectivePrice = discountPrice !== null ? discountPrice : price;
+    
+    // Make sure effectivePrice and quantity are valid numbers
+    return (effectivePrice || 0) * (item.quantity || 1);
   };
 
   const calculateSubtotal = (): number => {
@@ -159,15 +176,18 @@ const BillingPage = () => {
             <TableBody>
               {cart.length > 0 ? (
                 cart.map((item) => {
-                  const unitPrice = item.discountPrice !== undefined ? 
-                    getNumericPrice(item.discountPrice) : 
-                    getNumericPrice(item.price);
+                  console.log(item);
+                  // For display purposes, prefer discount price if available
+                  const unitPrice = item.discountPrice !== null 
+                    ? getNumericPrice(item.discountPrice) 
+                    : getNumericPrice(item.price);
+                    
                   const itemTotal = calculateItemTotal(item);
                   
                   return (
                     <TableRow key={item.id}>
                       <TableCell>{item.title} {item.size && `(${item.size})`}</TableCell>
-                      <TableCell>${formatCurrency(unitPrice)}</TableCell>
+                      <TableCell>${formatCurrency(unitPrice || 0)}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell className="text-right">${formatCurrency(itemTotal)}</TableCell>
                     </TableRow>
@@ -195,8 +215,8 @@ const BillingPage = () => {
         </CardContent>
       </Card>
 
-      <div className="p-4 border rounded-md mb-4">
-        <p>Cash on delivery. Please contact us if you require assistance or wish to make alternate arrangements.</p>
+      <div className="p-4 border rounded-md mb-4 border-amber-900">
+        <p>To Confirm your order please pay the shipping charge in bkash</p>
       </div>
 
       <Button className="w-full bg-amber-600 hover:bg-amber-700" onClick={handlePlaceOrder}>
