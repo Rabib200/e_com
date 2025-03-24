@@ -29,14 +29,26 @@ import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerDescription } from "@/components/ui/drawer";
-import Link from 'next/link';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerDescription,
+} from "@/components/ui/drawer";
+import Link from "next/link";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Club Jersey",
-    href: '/products?category=club-jersey',
+    href: "/products?category=club-jersey",
     description: "Browse all available products.",
   },
   {
@@ -119,7 +131,7 @@ const components: { title: string; href: string; description: string }[] = [
     href: "/products?category=nike",
     description: "Shop our collection of caps for kids.",
   },
- 
+
   {
     title: "Customer Support",
     href: "#",
@@ -135,7 +147,8 @@ const components: { title: string; href: string; description: string }[] = [
 const Header = () => {
   const [cartItems, setCartItems] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   // Cart loading logic
   useEffect(() => {
     try {
@@ -165,7 +178,12 @@ const Header = () => {
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
-  
+
+  // Add a function to close the drawer
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 z-50 shadow-md">
       <div className="flex items-center justify-between">
@@ -173,7 +191,7 @@ const Header = () => {
         <div className="flex-shrink-0">
           <h1 className="text-2xl font-bold">Headgear BD</h1>
         </div>
-        
+
         {/* Mobile Navigation */}
         <div className="flex items-center gap-4 md:hidden">
           {/* Cart Icon for Mobile */}
@@ -188,9 +206,9 @@ const Header = () => {
               </span>
             )}
           </div>
-          
+
           {/* Hamburger Menu */}
-          <Drawer>
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
@@ -207,22 +225,23 @@ const Header = () => {
               </DrawerHeader>
               <div className="px-4 py-2 overflow-y-auto">
                 <nav className="space-y-4">
-                  <Link 
-                    href="/" 
+                  <Link
+                    href="/"
+                    onClick={closeDrawer}
                     className="block py-3 px-4 text-lg font-medium text-black hover:bg-gray-100 rounded-md border border-gray-200"
                   >
                     Home
                   </Link>
-                  
-                  
+
                   <Accordion type="single" collapsible className="w-full">
-                
                     <AccordionItem value="jersey">
-                      <AccordionTrigger className="py-2 px-3">JERSEY</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        JERSEY
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(0, 3).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -233,13 +252,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="tshirts">
-                      <AccordionTrigger className="py-2 px-3">T-SHIRTS</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        T-SHIRTS
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(3, 6).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -250,13 +271,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="trousers">
-                      <AccordionTrigger className="py-2 px-3">TROUSERS</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        TROUSERS
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(6, 9).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -267,13 +290,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="pants">
-                      <AccordionTrigger className="py-2 px-3">PANTS</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        PANTS
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(9, 12).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -284,13 +309,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="winter">
-                      <AccordionTrigger className="py-2 px-3">WINTER</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        WINTER
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(12, 15).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -301,13 +328,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="sneakers">
-                      <AccordionTrigger className="py-2 px-3">SNEAKERS</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        SNEAKERS
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(15, 18).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -318,13 +347,15 @@ const Header = () => {
                         </div>
                       </AccordionContent>
                     </AccordionItem>
-                    
+
                     <AccordionItem value="contact">
-                      <AccordionTrigger className="py-2 px-3">Contact</AccordionTrigger>
+                      <AccordionTrigger className="py-2 px-3">
+                        Contact
+                      </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
                           {components.slice(18).map((component) => (
-                            <a 
+                            <a
                               key={component.title}
                               href={component.href}
                               className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
@@ -340,7 +371,7 @@ const Header = () => {
               </div>
             </DrawerContent>
           </Drawer>
-          
+
           {/* Mobile cart dropdown */}
           {isCartOpen && (
             <div className="absolute top-16 right-4 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
@@ -356,22 +387,24 @@ const Header = () => {
             </div>
           )}
         </div>
-        
+
         {/* Desktop Navigation - Hidden on Mobile */}
         <div className="hidden md:flex flex-grow justify-center">
           <NavigationMenu viewport={false} className="relative">
             <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
               <NavigationMenuItem>
-                <NavigationMenuLink 
-                  href="/" 
+                <NavigationMenuLink
+                  href="/"
                   className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
                 >
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">JERSEY</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  JERSEY
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -388,9 +421,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">T-SHIRTS</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  T-SHIRTS
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -407,9 +442,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">TROUSERS</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  TROUSERS
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -426,9 +463,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">PANTS</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  PANTS
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -445,9 +484,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">WINTER</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  WINTER
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -464,9 +505,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">SNEAKERS</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  SNEAKERS
+                </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -483,9 +526,11 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              
+
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">Contact</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="text-black">
+                  Contact
+                </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
                   <div className="w-[400px] lg:w-[500px] p-4">
                     <ul className="grid gap-3 lg:grid-cols-2">
@@ -505,7 +550,7 @@ const Header = () => {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        
+
         {/* Desktop Cart - Hidden on Mobile */}
         <div className="hidden md:block">
           <div className="relative">
@@ -615,20 +660,18 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get('/products');
+        const response = await axiosInstance.get("/products");
         setProducts(response.data);
-      }catch(error){
+      } catch (error) {
         console.error("Error fetching products:", error);
       }
-    }
+    };
     fetchProducts();
   }, []);
   function handleBuyNow(slug: string) {
     console.log("Buy Now Clicked for product:", slug);
     router.push(`/products/${slug}`);
-  } 
-    
-  
+  }
 
   return (
     <div>
@@ -666,7 +709,7 @@ const Home = () => {
                   priority
                 />
               </CarouselItem>
-              </CarouselContent>
+            </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
           </Carousel>
@@ -784,7 +827,6 @@ const Home = () => {
             NEW ARRIVALS !!!
           </b>
         </h6>
-        
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
           {products.map((product, index) => (
             <Card key={index} className="p-4">
@@ -800,13 +842,18 @@ const Home = () => {
                   />
                 </div>
                 <CardTitle>{product.title || "Product"}</CardTitle>
-                <p className="text-gray-600">{product.description || "Description"}</p>
-                <Button className="mt-4" onClick={() => handleBuyNow(product.slug)}>Buy Now</Button>
+                <p className="text-gray-600">
+                  {product.description || "Description"}
+                </p>
+                <Button
+                  className="mt-4"
+                  onClick={() => handleBuyNow(product.slug)}
+                >
+                  Buy Now
+                </Button>
               </CardContent>
             </Card>
           ))}
-          
-          
         </div>
       </main>
     </div>
