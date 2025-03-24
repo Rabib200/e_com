@@ -189,7 +189,7 @@ const Header = () => {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
-          <h1 className="text-2xl font-bold">Headgear BD</h1>
+          <h1 className="text-2xl font-bold"><Link href={'/'}>Headgear BD</Link></h1>
         </div>
 
         {/* Mobile Navigation */}
