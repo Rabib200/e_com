@@ -21,7 +21,7 @@ interface Product {
   slug: string;
   title: string;
   description: string;
-  image: string;
+  image?: string[] | null;
   discount?: number;
   discountPrice?: number;
   price: number;
@@ -80,18 +80,22 @@ const ProductsContent = () => {
       <h1 className="text-3xl font-bold mb-8">All Products</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {loading
-          ? Array.from({ length: productsPerPage }).map((_, i) => <SkeletonCard key={i} />)
+          ? Array.from({ length: productsPerPage }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))
           : currentProducts.map((product) => (
               <Card key={product.id} className="p-4">
                 <CardContent>
                   <div className="w-full h-64 relative">
-                    <Image
-                      src={product.image}
-                      alt={product.title}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      priority
-                    />
+                    {product.image?.[0] && (
+                      <Image
+                        src={product.image[0]}
+                        alt={product.title}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        priority
+                      />
+                    )}
                   </div>
                   <CardTitle>{product.title}</CardTitle>
                   <p className="text-gray-600">{product.description}</p>
@@ -137,7 +141,18 @@ const ProductsContent = () => {
 
 const Products = () => {
   return (
-    <Suspense fallback={<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>}>
+    <Suspense
+      fallback={
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      }
+    >
       <ProductsContent />
     </Suspense>
   );

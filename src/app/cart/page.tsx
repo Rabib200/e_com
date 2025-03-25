@@ -104,7 +104,7 @@ const CartPage = () => {
               <TableRow key={item.id}>
                 <TableCell>
                   <div className="w-16 h-16 relative">
-                    <Image src={item.image} alt={item.title} fill style={{ objectFit: "cover" }} />
+                    <Image src={item.image[0]} alt={item.title} fill style={{ objectFit: "cover" }} />
                   </div>
                 </TableCell>
                 <TableCell>{item.title}</TableCell>
@@ -157,7 +157,7 @@ const CartPage = () => {
           </Card>
         </div>
       )}
-    </div>
+    </div> 
   );
 };
 

@@ -112,7 +112,7 @@ export default function ProductDetails() {
         <CardContent className="space-y-4">
           <div className="w-full h-80 relative rounded-lg overflow-hidden">
             <Image
-              src={product.image}
+              src={product.image[0]}
               alt={product.title}
               fill
               style={{ objectFit: "cover" }}

@@ -646,7 +646,7 @@ const Footer = () => {
 
 interface Product {
   id: UUID;
-  image: string;
+  image: string[];
   title: string;
   description: string;
   slug: string;
@@ -833,7 +833,7 @@ const Home = () => {
               <CardContent>
                 <div className="w-full h-64 relative">
                   <Image
-                    src={product.image || "/placeholder.webp"}
+                    src={product.image[0] || "/placeholder.webp"}
                     alt={product.title || "Product"}
                     layout="fill"
                     objectFit="cover"
