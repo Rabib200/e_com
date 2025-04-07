@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CartItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
+import { ErrorWithResponse } from "@/lib/errorTemplate";
 
 const BillingPage = () => {
   const router = useRouter();
@@ -140,9 +141,10 @@ const BillingPage = () => {
 
       
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order placement failed:", error);
-      alert(`Failed to place order: ${error.message}`);
+      const typedError = error as ErrorWithResponse;
+      alert(`Failed to place order: ${typedError.message}`);
     }
   };
 

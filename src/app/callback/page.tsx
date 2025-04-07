@@ -3,6 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { ErrorWithResponse } from '@/lib/errorTemplate';
 
 type PaymentStatus = 'loading' | 'success' | 'failure' | 'cancel';
 
@@ -11,7 +12,16 @@ const CallbackPage = () => {
   const router = useRouter();
   const [status, setStatus] = useState<PaymentStatus>('loading');
   const [message, setMessage] = useState('Processing your payment...');
-  const [paymentDetails, setPaymentDetails] = useState<any>(null);
+  interface PaymentDetails {
+    trxID?: string;
+    paymentID?: string;
+    amount?: number;
+    currency?: string;
+    transactionStatus?: string;
+    [key: string]: string | number | boolean | null | undefined; // Optional: For additional dynamic fields
+  }
+
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
 
   useEffect(() => {
     const processPayment = async () => {
@@ -97,10 +107,11 @@ const CallbackPage = () => {
           setMessage(`Payment failed: ${executionResult.statusMessage || 'Unknown error'}`);
         }
         
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Payment processing failed:', error);
+        const typedError = error as ErrorWithResponse;
         setStatus('failure');
-        setMessage(`Payment failed: ${error.message}`);
+        setMessage(`Payment failed: ${typedError.message}`);
       }
     };
     
@@ -108,34 +119,34 @@ const CallbackPage = () => {
   }, [searchParams]);
   
   // Function to save order to your database
-  const saveOrder = async (paymentDetails: any) => {
-    try {
-      // Get customer info from local storage if you saved it during checkout
-      const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
-      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+//   const saveOrder = async (paymentDetails: PaymentDetails) => {
+//     try {
+//       // Get customer info from local storage if you saved it during checkout
+//       const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
+//       const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
       
-      const orderData = {
-        paymentDetails,
-        customerInfo,
-        items: cartItems,
-        orderDate: new Date().toISOString(),
-        totalAmount: paymentDetails.amount
-      };
+//       const orderData = {
+//         paymentDetails,
+//         customerInfo,
+//         items: cartItems,
+//         orderDate: new Date().toISOString(),
+//         totalAmount: paymentDetails.amount
+//       };
       
-      // Send to your order API endpoint
-      const orderResponse = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
+//       // Send to your order API endpoint
+//       const orderResponse = await fetch('/api/orders', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(orderData)
+//       });
       
-      if (!orderResponse.ok) {
-        console.error('Failed to save order');
-      }
-    } catch (error) {
-      console.error('Error saving order:', error);
-    }
-  };
+//       if (!orderResponse.ok) {
+//         console.error('Failed to save order');
+//       }
+//     } catch (error) {
+//       console.error('Error saving order:', error);
+//     }
+//   };
   
   const handleContinueShopping = () => {
     router.push('/');

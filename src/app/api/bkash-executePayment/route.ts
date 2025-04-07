@@ -1,3 +1,5 @@
+import { ErrorWithResponse } from "@/lib/errorTemplate";
+
 export async function POST(request: Request) {
     try {
         const requestData = await request.json();
@@ -18,13 +20,14 @@ export async function POST(request: Request) {
             status: result.status,
             headers: { "Content-Type": "application/json" },
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error executing payment:", error);
+        const typedError = error as ErrorWithResponse;
 
         // Return appropriate error message and status
-        const statusCode = error.response?.status || 500;
-        const errorMessage = error.response?.data?.error ||
-            error.message ||
+        const statusCode = typedError.response?.status || 500;
+        const errorMessage = typedError.response?.data?.error ||
+            typedError.message ||
             "Failed to execute payment";
 
         return new Response(JSON.stringify({ error: errorMessage }), {

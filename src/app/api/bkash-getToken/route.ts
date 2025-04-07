@@ -1,3 +1,4 @@
+import { ErrorWithResponse } from "@/lib/errorTemplate";
 import axios from "axios";
 
 export async function GET() {
@@ -20,12 +21,14 @@ export async function GET() {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error getting token:", error);
 
+        const typedError = error as ErrorWithResponse;
         // Return appropriate error message and status
-        const statusCode = error.response?.status || 500;
-        const errorMessage = error.response?.data?.error || error.message ||
+        const statusCode = typedError.response?.status || 500;
+        const errorMessage = typedError.response?.data?.error ||
+            typedError.message ||
             "Failed to get token";
 
         return new Response(JSON.stringify({ error: errorMessage }), {
