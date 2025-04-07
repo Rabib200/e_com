@@ -1,0 +1,5 @@
+{
+    "ignoreCommand": "echo 'Ignore Supabase Functions'",
+    "buildCommand": "next build",
+    "outputDirectory": "out"
+}
