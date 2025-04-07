@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CartItem } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 const BillingPage = () => {
+  const router = useRouter();
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -29,15 +32,27 @@ const BillingPage = () => {
     }
   }, []);
 
+  // Fix the handleInputChange function to properly map IDs to state properties
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    
+    // Map the field IDs to state properties
+    const fieldMappings: Record<string, string> = {
+      'full-name': 'fullName',
+      'street-address': 'streetAddress',
+      'city': 'city',
+      'phone': 'phone',
+      'email': 'email'
+    };
+    
+    const stateKey = fieldMappings[id] || id;
+    
     setFormData(prev => ({
       ...prev,
-      [id.replace('-', '')]: value
+      [stateKey]: value
     }));
   };
 
-  // Update the getNumericPrice function to properly handle different price formats
   const getNumericPrice = (price: string | number | undefined): number => {
     if (price === undefined) {
       return 0;
@@ -56,7 +71,6 @@ const BillingPage = () => {
     return typeof price === 'number' ? price : 0;
   };
 
-  // Update the calculateItemTotal function to better handle undefined prices
   const calculateItemTotal = (item: CartItem): number => {
     const price = getNumericPrice(item.price);
     const discountPrice = item.discountPrice !== null 
@@ -78,30 +92,67 @@ const BillingPage = () => {
     return amount.toFixed(2);
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     // Validate form
     if (!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email) {
       alert("Please fill in all required fields");
       return;
     }
 
-    // Process order
-    const order = {
-      customer: formData,
-      items: cart,
-      subtotal: calculateSubtotal(),
-      total: calculateSubtotal(),
-      orderDate: new Date().toISOString()
-    };
+  
 
-    console.log("Order placed:", order);
-    
-    // Here you would typically send this to your backend
-    alert("Order placed successfully!");
-    
-    // Clear cart
-    localStorage.removeItem("cart");
-    setCart([]);
+    try {
+      // Step 1: Get bKash token
+      const grantTokenResponse = await fetch("/api/bkash-getToken");
+      if (!grantTokenResponse.ok) {
+        throw new Error("Failed to get payment token");
+      }
+      const tokenData = await grantTokenResponse.json();
+      console.log("Token data:", tokenData);
+      
+     // Step 2: Create payment with the token
+      const createPaymentResponse = await fetch("/api/bkash-createPayment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: tokenData.id_token, // Use the correct token property based on your API response
+          amount: calculateSubtotal().toString(),
+          currency: "BDT",
+          intent: "sale",
+          merchantInvoiceNumber: `INV-${Date.now()}` // Generate a unique invoice number
+        }),
+      });
+      
+      if (!createPaymentResponse.ok) {
+        throw new Error("Failed to create payment");
+      }
+      
+      const paymentData = await createPaymentResponse.json();
+      console.log("Payment created:", paymentData);
+      
+      // If the payment creation returns a URL to redirect to
+      if (paymentData.bkashURL) {
+        window.location.href = paymentData.bkashURL;
+        return;
+      }
+
+      
+      
+    } catch (error: any) {
+      console.error("Order placement failed:", error);
+      alert(`Failed to place order: ${error.message}`);
+    }
+  };
+
+  // Check if cart is empty
+  const isCartEmpty = cart.length === 0;
+
+  // Add navigation to handle going back to the products
+  
+  const handleGoToProducts = () => {
+    router.push('/');
   };
 
   return (
@@ -219,9 +270,31 @@ const BillingPage = () => {
         <p>To Confirm your order please pay the shipping charge in bkash</p>
       </div>
 
-      <Button className="w-full bg-amber-600 hover:bg-amber-700" onClick={handlePlaceOrder}>
-        Place Order
-      </Button>
+      {isCartEmpty ? (
+        <div className="text-center mb-6">
+          <p className="text-lg text-red-600 mb-4">Your cart is empty. Please add items to place an order.</p>
+          <Button 
+            className="w-full bg-blue-600 hover:bg-blue-700" 
+            onClick={handleGoToProducts}
+          >
+            Browse Products
+          </Button>
+        </div>
+      ) : (
+        <Button 
+          className="w-full bg-amber-600 hover:bg-amber-700" 
+          onClick={handlePlaceOrder}
+          disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email}
+        >
+          Place Order
+        </Button>
+      )}
+      
+      {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || formData.email === '') && (
+        <p className="text-sm text-red-500 text-center mt-2">
+          Please fill in all required fields to place your order
+        </p>
+      )}
     </div>
   );
 };
