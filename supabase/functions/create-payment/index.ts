@@ -64,7 +64,7 @@ serve(async (req: Request) => {
         const paymentBody = JSON.stringify({
             mode: "0011",
             payerReference: " ",
-            callbackURL: "http://localhost:3000/callback",
+            callbackURL: "https://e-com-six-rouge.vercel.app/callback",
             amount: requestData.amount,
             currency: requestData.currency || "BDT",
             intent: requestData.intent || "sale",
