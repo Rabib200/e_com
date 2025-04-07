@@ -1,13 +1,14 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { ErrorWithResponse } from '@/lib/errorTemplate';
 
 type PaymentStatus = 'loading' | 'success' | 'failure' | 'cancel';
 
-const CallbackPage = () => {
+// Create a client component that uses the searchParams
+function CallbackClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<PaymentStatus>('loading');
@@ -240,6 +241,21 @@ const CallbackPage = () => {
       )}
     </div>
   );
-};
+}
 
-export default CallbackPage;
+// Main page component with Suspense
+export default function CallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="text-center bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Loading Payment Details</h2>
+          <p>Please wait...</p>
+        </div>
+      </div>
+    }>
+      <CallbackClient />
+    </Suspense>
+  );
+}
