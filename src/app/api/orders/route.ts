@@ -80,7 +80,7 @@ export async function POST(request: Request) {
                 customer_phone: orderData.customerInfo.phone,
                 shipping_address: orderData.customerInfo.streetAddress,
                 city: orderData.customerInfo.city,
-                total_amount: totalAmount,
+                paid_amount: totalAmount,
                 payment_status: orderData.paymentDetails.transactionStatus ||
                     "Completed",
                 payment_id: orderData.paymentDetails.paymentID,
