@@ -9,6 +9,17 @@ import { CartItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
 
+interface ShippingOption {
+  id: string;
+  label: string;
+  price: number; // Changed to number for easier calculation
+}
+
+const shippingOptions: ShippingOption[] = [
+  { id: "inside_dhaka", label: "Inside Dhaka", price: 80 },
+  { id: "outside_dhaka", label: "Outside Dhaka", price: 120 }
+];
+
 const BillingPage = () => {
   const router = useRouter();
   
@@ -18,8 +29,12 @@ const BillingPage = () => {
     streetAddress: "",
     city: "",
     phone: "",
-    email: ""
+    email: "",
+    shippingOption: "inside_dhaka" // Default to the first shipping option
   });
+  
+  // Track the selected shipping option for display and calculation
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption>(shippingOptions[0]);
 
   useEffect(() => {
     try {
@@ -27,8 +42,19 @@ const BillingPage = () => {
       if (Array.isArray(savedCart)) {
         setCart(savedCart);
       }
+      
+      // Check if there's a saved shipping option in localStorage
+      const savedShippingOption = localStorage.getItem("shippingOption");
+      if (savedShippingOption) {
+        const parsedOption = JSON.parse(savedShippingOption);
+        const option = shippingOptions.find(opt => opt.id === parsedOption.id);
+        if (option) {
+          setSelectedShipping(option);
+          setFormData(prev => ({ ...prev, shippingOption: option.id }));
+        }
+      }
     } catch (error) {
-      console.error("Error loading cart:", error);
+      console.error("Error loading cart or shipping options:", error);
       setCart([]);
     }
   }, []);
@@ -52,6 +78,18 @@ const BillingPage = () => {
       ...prev,
       [stateKey]: value
     }));
+  };
+  
+  // Handle shipping option change
+  const handleShippingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const shippingId = e.target.value;
+    const option = shippingOptions.find(opt => opt.id === shippingId) || shippingOptions[0];
+    
+    setSelectedShipping(option);
+    setFormData(prev => ({ ...prev, shippingOption: option.id }));
+    
+    // Also save to localStorage for persistence
+    localStorage.setItem("shippingOption", JSON.stringify(option));
   };
 
   const getNumericPrice = (price: string | number | undefined): number => {
@@ -88,6 +126,11 @@ const BillingPage = () => {
   const calculateSubtotal = (): number => {
     return cart.reduce((total, item) => total + calculateItemTotal(item), 0);
   };
+  
+  // Calculate the final total including shipping
+  const calculateTotal = (): number => {
+    return calculateSubtotal() + selectedShipping.price;
+  };
 
   const formatCurrency = (amount: number): string => {
     return amount.toFixed(2);
@@ -100,7 +143,11 @@ const BillingPage = () => {
       return;
     }
 
-    localStorage.setItem("customerInfo", JSON.stringify(formData));
+    // Save customer info and selected shipping option
+    localStorage.setItem("customerInfo", JSON.stringify({
+      ...formData,
+      shippingOption: selectedShipping
+    }));
 
     try {
       // Step 1: Get bKash token
@@ -111,18 +158,19 @@ const BillingPage = () => {
       const tokenData = await grantTokenResponse.json();
       console.log("Token data:", tokenData);
       
-     // Step 2: Create payment with the token
+      // Step 2: Create payment with the token
+      // Include shipping cost in the total amount
       const createPaymentResponse = await fetch("/api/bkash-createPayment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          accessToken: tokenData.id_token, // Use the correct token property based on your API response
-          amount: calculateSubtotal().toString(),
+          accessToken: tokenData.id_token,
+          amount: selectedShipping.price, // Use only the shipping charge
           currency: "BDT",
           intent: "sale",
-          merchantInvoiceNumber: `INV-${Date.now()}` // Generate a unique invoice number
+          merchantInvoiceNumber: `INV-${Date.now()}`
         }),
       });
       
@@ -138,9 +186,6 @@ const BillingPage = () => {
         window.location.href = paymentData.bkashURL;
         return;
       }
-
-      
-      
     } catch (error: unknown) {
       console.error("Order placement failed:", error);
       const typedError = error as ErrorWithResponse;
@@ -152,7 +197,6 @@ const BillingPage = () => {
   const isCartEmpty = cart.length === 0;
 
   // Add navigation to handle going back to the products
-  
   const handleGoToProducts = () => {
     router.push('/');
   };
@@ -212,6 +256,21 @@ const BillingPage = () => {
             required
           />
         </div>
+        <div>
+          <Label htmlFor="shipping-option">Shipping Option *</Label>
+          <select 
+            id="shipping-option" 
+            className="w-full p-2 border rounded-md"
+            value={formData.shippingOption}
+            onChange={handleShippingChange}
+          >
+            {shippingOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label} - ৳{option.price}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <h2 className="text-2xl font-bold mb-4">Your Order</h2>
@@ -229,7 +288,6 @@ const BillingPage = () => {
             <TableBody>
               {cart.length > 0 ? (
                 cart.map((item) => {
-                  console.log(item);
                   // For display purposes, prefer discount price if available
                   const unitPrice = item.discountPrice !== null 
                     ? getNumericPrice(item.discountPrice) 
@@ -240,9 +298,9 @@ const BillingPage = () => {
                   return (
                     <TableRow key={item.id}>
                       <TableCell>{item.title} {item.size && `(${item.size})`}</TableCell>
-                      <TableCell>${formatCurrency(unitPrice || 0)}</TableCell>
+                      <TableCell>৳{formatCurrency(unitPrice || 0)}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
-                      <TableCell className="text-right">${formatCurrency(itemTotal)}</TableCell>
+                      <TableCell className="text-right">৳{formatCurrency(itemTotal)}</TableCell>
                     </TableRow>
                   );
                 })
@@ -253,15 +311,15 @@ const BillingPage = () => {
               )}
               <TableRow>
                 <TableCell colSpan={3} className="font-bold">Subtotal</TableCell>
-                <TableCell className="text-right">${formatCurrency(calculateSubtotal())}</TableCell>
+                <TableCell className="text-right">৳{formatCurrency(calculateSubtotal())}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell colSpan={3} className="font-bold">Shipping</TableCell>
-                <TableCell className="text-right">Free</TableCell>
+                <TableCell colSpan={3} className="font-bold">Shipping ({selectedShipping.label})</TableCell>
+                <TableCell className="text-right">৳{selectedShipping.price}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell colSpan={3} className="font-bold text-lg">Total</TableCell>
-                <TableCell className="text-right font-bold text-lg">${formatCurrency(calculateSubtotal())}</TableCell>
+                <TableCell className="text-right font-bold text-lg">৳{formatCurrency(calculateTotal())}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -269,7 +327,7 @@ const BillingPage = () => {
       </Card>
 
       <div className="p-4 border rounded-md mb-4 border-amber-900">
-        <p>To Confirm your order please pay the shipping charge in bkash</p>
+        <p>To confirm your order please pay using bKash</p>
       </div>
 
       {isCartEmpty ? (
