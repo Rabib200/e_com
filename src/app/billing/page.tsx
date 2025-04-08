@@ -100,7 +100,7 @@ const BillingPage = () => {
       return;
     }
 
-  
+    localStorage.setItem("customerInfo", JSON.stringify(formData));
 
     try {
       // Step 1: Get bKash token

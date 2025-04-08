@@ -92,7 +92,7 @@ function CallbackClient() {
         const transactionStatus = executionResult.transactionStatus?.toLowerCase();
         if (transactionStatus === 'completed' || transactionStatus === 'success') {
           // Payment successful
-        //   await saveOrder(executionResult);
+          await saveOrder(executionResult);
           setPaymentDetails(executionResult);
           setStatus('success');
           setMessage('Payment successful!');
@@ -120,34 +120,70 @@ function CallbackClient() {
   }, [searchParams]);
   
   // Function to save order to your database
-//   const saveOrder = async (paymentDetails: PaymentDetails) => {
-//     try {
-//       // Get customer info from local storage if you saved it during checkout
-//       const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
-//       const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+  const saveOrder = async (paymentDetails: PaymentDetails) => {
+    try {
+      // Get customer info from local storage if you saved it during checkout
+      const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
+      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
       
-//       const orderData = {
-//         paymentDetails,
-//         customerInfo,
-//         items: cartItems,
-//         orderDate: new Date().toISOString(),
-//         totalAmount: paymentDetails.amount
-//       };
+      // Validate required customer information
+      if (!customerInfo.fullName || !customerInfo.streetAddress || !customerInfo.city) {
+        console.error('Missing required customer information');
+        return false;
+      }
       
-//       // Send to your order API endpoint
-//       const orderResponse = await fetch('/api/orders', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify(orderData)
-//       });
+      // Validate cart items
+      if (!cartItems || cartItems.length === 0) {
+        console.error('Cart is empty');
+        return false;
+      }
       
-//       if (!orderResponse.ok) {
-//         console.error('Failed to save order');
-//       }
-//     } catch (error) {
-//       console.error('Error saving order:', error);
-//     }
-//   };
+      // Ensure amount is available
+      const totalAmount = paymentDetails.amount || 
+        cartItems.reduce((total: number, item: any) => {
+          const price = typeof item.price === 'string' 
+            ? parseFloat(item.price.replace(/[^0-9.-]+/g, "")) 
+            : Number(item.price);
+          
+          const itemQuantity = item.quantity || 1;
+          return total + (price * itemQuantity);
+        }, 0);
+      
+      const orderData = {
+        paymentDetails,
+        customerInfo,
+        items: cartItems,
+        orderDate: new Date().toISOString(),
+        totalAmount: totalAmount
+      };
+      
+      console.log('Sending order data:', orderData);
+      
+      // Send to order API endpoint
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+      
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        console.error('Failed to save order:', errorData);
+        return false;
+      }
+      
+      const result = await orderResponse.json();
+      console.log('Order saved successfully:', result);
+      
+      // Clear the cart and customer info from localStorage
+      localStorage.removeItem('cart');
+      
+      return true;
+    } catch (error) {
+      console.error('Error saving order:', error);
+      return false;
+    }
+  };
   
   const handleContinueShopping = () => {
     router.push('/');
