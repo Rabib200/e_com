@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { ErrorWithResponse } from '@/lib/errorTemplate';
+import { CartItem } from '@/lib/types';
 
 type PaymentStatus = 'loading' | 'success' | 'failure' | 'cancel';
 
@@ -25,6 +26,79 @@ function CallbackClient() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
 
   useEffect(() => {
+    // Function to save order to your database
+    const saveOrder = async (paymentDetails: PaymentDetails) => {
+      try {
+        // Get customer info from local storage if you saved it during checkout
+        const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
+        const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+        
+        // Validate required customer information
+        if (!customerInfo.fullName || !customerInfo.streetAddress || !customerInfo.city) {
+          console.error('Missing required customer information');
+          return false;
+        }
+        
+        // Validate cart items
+        if (!cartItems || cartItems.length === 0) {
+          console.error('Cart is empty');
+          return false;
+        }
+        
+        // Ensure amount is available - fix the type issue with proper type checking
+        const totalAmount = paymentDetails.amount || 
+          cartItems.reduce((total: number, item: CartItem) => {
+            // Safe type handling for price
+            let price: number;
+            if (typeof item.price === 'string') {
+              // Only try to replace if it's a string
+              price = parseFloat(item.price) || 0;
+            } else if (typeof item.price === 'number') {
+              price = item.price;
+            } else {
+              price = 0; // Default if price is undefined or null
+            }
+            
+            const itemQuantity = item.quantity || 1;
+            return total + (price * itemQuantity);
+          }, 0);
+        
+        const orderData = {
+          paymentDetails,
+          customerInfo,
+          items: cartItems,
+          orderDate: new Date().toISOString(),
+          totalAmount: totalAmount
+        };
+        
+        console.log('Sending order data:', orderData);
+        
+        // Send to order API endpoint
+        const orderResponse = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData)
+        });
+        
+        if (!orderResponse.ok) {
+          const errorData = await orderResponse.json();
+          console.error('Failed to save order:', errorData);
+          return false;
+        }
+        
+        const result = await orderResponse.json();
+        console.log('Order saved successfully:', result);
+        
+        // Clear the cart and customer info from localStorage
+        localStorage.removeItem('cart');
+        
+        return true;
+      } catch (error) {
+        console.error('Error saving order:', error);
+        return false;
+      }
+    };
+
     const processPayment = async () => {
       try {
         // Get the payment ID and status from search params
@@ -118,72 +192,6 @@ function CallbackClient() {
     
     processPayment();
   }, [searchParams]);
-  
-  // Function to save order to your database
-  const saveOrder = async (paymentDetails: PaymentDetails) => {
-    try {
-      // Get customer info from local storage if you saved it during checkout
-      const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
-      const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-      
-      // Validate required customer information
-      if (!customerInfo.fullName || !customerInfo.streetAddress || !customerInfo.city) {
-        console.error('Missing required customer information');
-        return false;
-      }
-      
-      // Validate cart items
-      if (!cartItems || cartItems.length === 0) {
-        console.error('Cart is empty');
-        return false;
-      }
-      
-      // Ensure amount is available
-      const totalAmount = paymentDetails.amount || 
-        cartItems.reduce((total: number, item: any) => {
-          const price = typeof item.price === 'string' 
-            ? parseFloat(item.price.replace(/[^0-9.-]+/g, "")) 
-            : Number(item.price);
-          
-          const itemQuantity = item.quantity || 1;
-          return total + (price * itemQuantity);
-        }, 0);
-      
-      const orderData = {
-        paymentDetails,
-        customerInfo,
-        items: cartItems,
-        orderDate: new Date().toISOString(),
-        totalAmount: totalAmount
-      };
-      
-      console.log('Sending order data:', orderData);
-      
-      // Send to order API endpoint
-      const orderResponse = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
-      
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json();
-        console.error('Failed to save order:', errorData);
-        return false;
-      }
-      
-      const result = await orderResponse.json();
-      console.log('Order saved successfully:', result);
-      
-      // Clear the cart and customer info from localStorage
-      localStorage.removeItem('cart');
-      
-      return true;
-    } catch (error) {
-      console.error('Error saving order:', error);
-      return false;
-    }
-  };
   
   const handleContinueShopping = () => {
     router.push('/');

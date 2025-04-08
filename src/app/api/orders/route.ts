@@ -9,7 +9,6 @@ interface PaymentDetails {
     amount?: number | string;
     currency?: string;
     transactionStatus?: string;
-    [key: string]: any;
 }
 
 interface CustomerInfo {
