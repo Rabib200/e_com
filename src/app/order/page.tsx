@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { 
   Truck, 
   CheckCircle, 
@@ -15,8 +15,6 @@ import {
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { OrderStatus } from '@/lib/orderStatus.enum';
-
-
 
 // Interface to match the API response
 interface OrderDetails {
@@ -54,7 +52,15 @@ interface OrderItem {
   };
 }
 
-const OrderPage = () => {
+// Loading component for suspense fallback
+const OrderLoadingState = () => (
+  <div className="flex justify-center items-center min-h-screen pt-20">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-amber-600"></div>
+  </div>
+);
+
+// Create a separate component that uses useSearchParams
+const OrderContent = () => {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const [order, setOrder] = useState<OrderDetails | null>(null);
@@ -360,6 +366,15 @@ const OrderPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Main page component with Suspense
+const OrderPage = () => {
+  return (
+    <Suspense fallback={<OrderLoadingState />}>
+      <OrderContent />
+    </Suspense>
   );
 };
 
