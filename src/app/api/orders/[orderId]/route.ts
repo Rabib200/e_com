@@ -2,12 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
 
+// Update the type definition for params to match Next.js 15.x requirements
 export async function GET(
   request: Request,
-  { params }: { params: { orderId: string } }
+  context: { params: { orderId: string } }
 ) {
   try {
-    const {orderId} = params;
+    const { orderId } = context.params;
 
     if (!orderId) {
       return NextResponse.json(
