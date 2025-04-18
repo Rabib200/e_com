@@ -2,13 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
 
-// Update the type definition for params to match Next.js 15.x requirements
-export async function GET(
-  request: Request,
-  context: { params: { orderId: string } }
-) {
+export async function GET(request: Request) {
   try {
-    const { orderId } = context.params;
+    const url = new URL(request.url);
+    const pathnameParts = url.pathname.split("/");
+    const orderId = pathnameParts[pathnameParts.length - 1]; // Get [orderId]
 
     if (!orderId) {
       return NextResponse.json(
@@ -24,10 +22,8 @@ export async function GET(
       throw new Error("Supabase environment variables not set");
     }
 
-    // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    // Fetch order details
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
@@ -42,7 +38,6 @@ export async function GET(
       );
     }
 
-    // Fetch order items
     const { data: items, error: itemsError } = await supabase
       .from("order_items")
       .select("*")
@@ -58,7 +53,6 @@ export async function GET(
       );
     }
 
-    // Combine order and items data in the format expected by the frontend
     const responseData = {
       id: order.id,
       status: order.status.toLowerCase(),
@@ -72,7 +66,7 @@ export async function GET(
       shippingAddress: order.shipping_address,
       city: order.city,
       paymentStatus: order.payment_status,
-      transactionId: order.transaction_id
+      transactionId: order.transaction_id,
     };
 
     return NextResponse.json(responseData);
@@ -80,7 +74,6 @@ export async function GET(
     console.error("Error fetching order:", error);
 
     const typedError = error as ErrorWithResponse;
-    // Return appropriate error message and status
     const statusCode = typedError.response?.status || 500;
     const errorMessage =
       typedError.response?.data?.error ||
