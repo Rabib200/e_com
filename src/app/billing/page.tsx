@@ -8,11 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { CartItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
+import { Copy, Check, CreditCard, ShoppingBag } from "lucide-react";
 
 interface ShippingOption {
   id: string;
   label: string;
-  price: number; // Changed to number for easier calculation
+  price: number;
 }
 
 const shippingOptions: ShippingOption[] = [
@@ -30,11 +31,13 @@ const BillingPage = () => {
     city: "",
     phone: "",
     email: "",
-    shippingOption: "inside_dhaka" // Default to the first shipping option
+    shippingOption: "inside_dhaka"
   });
   
-  // Track the selected shipping option for display and calculation
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption>(shippingOptions[0]);
+  const [copying, setCopying] = useState(false);
+  const [transactionId, setTransactionId] = useState("");
+  const [transactionIdError, setTransactionIdError] = useState("");
 
   useEffect(() => {
     try {
@@ -43,7 +46,6 @@ const BillingPage = () => {
         setCart(savedCart);
       }
       
-      // Check if there's a saved shipping option in localStorage
       const savedShippingOption = localStorage.getItem("shippingOption");
       if (savedShippingOption) {
         const parsedOption = JSON.parse(savedShippingOption);
@@ -59,11 +61,9 @@ const BillingPage = () => {
     }
   }, []);
 
-  // Fix the handleInputChange function to properly map IDs to state properties
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     
-    // Map the field IDs to state properties
     const fieldMappings: Record<string, string> = {
       'full-name': 'fullName',
       'street-address': 'streetAddress',
@@ -80,7 +80,6 @@ const BillingPage = () => {
     }));
   };
   
-  // Handle shipping option change
   const handleShippingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const shippingId = e.target.value;
     const option = shippingOptions.find(opt => opt.id === shippingId) || shippingOptions[0];
@@ -88,7 +87,6 @@ const BillingPage = () => {
     setSelectedShipping(option);
     setFormData(prev => ({ ...prev, shippingOption: option.id }));
     
-    // Also save to localStorage for persistence
     localStorage.setItem("shippingOption", JSON.stringify(option));
   };
 
@@ -98,15 +96,12 @@ const BillingPage = () => {
     }
     
     if (typeof price === 'string') {
-      // If price is a string with $ symbol (e.g., "$10.99")
       if (price.startsWith('$')) {
         return parseFloat(price.substring(1));
       }
-      // Handle other string formats
       return parseFloat(price.replace(/[^0-9.-]+/g, '')) || 0;
     }
     
-    // If price is already a number
     return typeof price === 'number' ? price : 0;
   };
 
@@ -116,10 +111,8 @@ const BillingPage = () => {
       ? getNumericPrice(item.discountPrice) 
       : null;
       
-    // Use discount price if available, otherwise use regular price
     const effectivePrice = discountPrice !== null ? discountPrice : price;
     
-    // Make sure effectivePrice and quantity are valid numbers
     return (effectivePrice || 0) * (item.quantity || 1);
   };
 
@@ -127,7 +120,6 @@ const BillingPage = () => {
     return cart.reduce((total, item) => total + calculateItemTotal(item), 0);
   };
   
-  // Calculate the final total including shipping
   const calculateTotal = (): number => {
     return calculateSubtotal() + selectedShipping.price;
   };
@@ -136,56 +128,77 @@ const BillingPage = () => {
     return amount.toFixed(2);
   };
 
+  const handleTransactionIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTransactionId(e.target.value);
+    if (e.target.value.trim() === "") {
+      setTransactionIdError("Transaction ID is required after payment");
+    } else {
+      setTransactionIdError("");
+    }
+  };
+
   const handlePlaceOrder = async () => {
-    // Validate form
+    // Form validation
     if (!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email) {
       alert("Please fill in all required fields");
       return;
     }
 
-    // Save customer info and selected shipping option
+    // Transaction ID validation
+    if (!transactionId.trim()) {
+      setTransactionIdError("Please enter your bKash Transaction ID");
+      return;
+    }
+
+    // Save customer info to localStorage
     localStorage.setItem("customerInfo", JSON.stringify({
       ...formData,
-      shippingOption: selectedShipping
+      shippingOption: selectedShipping,
+      transactionId: transactionId.trim()
     }));
 
     try {
-      // Step 1: Get bKash token
-      const grantTokenResponse = await fetch("/api/bkash-getToken");
-      if (!grantTokenResponse.ok) {
-        throw new Error("Failed to get payment token");
-      }
-      const tokenData = await grantTokenResponse.json();
-      console.log("Token data:", tokenData);
-      
-      // Step 2: Create payment with the token
-      // Include shipping cost in the total amount
-      const createPaymentResponse = await fetch("/api/bkash-createPayment", {
+      // Create the order directly with the transaction ID
+      const orderResponse = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          accessToken: tokenData.id_token,
-          amount: selectedShipping.price, // Use only the shipping charge
-          currency: "BDT",
-          intent: "sale",
-          merchantInvoiceNumber: `INV-${Date.now()}`
-        }),
+          paymentDetails: {
+            amount: calculateTotal(),
+            transactionStatus: "Completed",
+            transactionId: transactionId.trim(),
+            paymentMethod: "bkash",
+            currency: "BDT",
+          },
+          customerInfo: {
+            fullName: formData.fullName,
+            streetAddress: formData.streetAddress,
+            city: formData.city,
+            phone: formData.phone,
+            email: formData.email
+          },
+          items: cart,
+          orderDate: new Date().toISOString(),
+          totalAmount: calculateTotal(),
+          shipping: selectedShipping
+        })
       });
       
-      if (!createPaymentResponse.ok) {
-        throw new Error("Failed to create payment");
+      if (!orderResponse.ok) {
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || "Failed to create order");
       }
       
-      const paymentData = await createPaymentResponse.json();
-      console.log("Payment created:", paymentData);
+      const orderResult = await orderResponse.json();
       
-      // If the payment creation returns a URL to redirect to
-      if (paymentData.bkashURL) {
-        window.location.href = paymentData.bkashURL;
-        return;
-      }
+      // Clear cart after successful order
+      localStorage.removeItem("cart");
+      
+      // Redirect to success page
+      router.push(`/order?orderId=${orderResult.orderId}`);
+      
     } catch (error: unknown) {
       console.error("Order placement failed:", error);
       const typedError = error as ErrorWithResponse;
@@ -193,168 +206,269 @@ const BillingPage = () => {
     }
   };
 
-  // Check if cart is empty
   const isCartEmpty = cart.length === 0;
 
-  // Add navigation to handle going back to the products
   const handleGoToProducts = () => {
     router.push('/');
   };
 
+  const copyBkashNumber = () => {
+    const bkashNumber = "01701503990";
+    navigator.clipboard.writeText(bkashNumber)
+      .then(() => {
+        setCopying(true);
+        setTimeout(() => setCopying(false), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy: ', err);
+      });
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-24">
-      <h2 className="text-2xl font-bold mb-4">Billing Details</h2>
-      <div className="grid grid-cols-1 gap-4 mb-6">
-        <div>
-          <Label htmlFor="full-name">Full Name *</Label>
-          <Input 
-            id="full-name" 
-            placeholder="Enter your full name" 
-            value={formData.fullName}
-            onChange={handleInputChange}
-            required
-          />
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 mt-16 sm:mt-24">
+      {!isCartEmpty && (
+        <div className="md:hidden mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Order Summary</h2>
+            <span className="text-lg font-semibold">৳{formatCurrency(calculateTotal())}</span>
+          </div>
+          <Card>
+            <CardContent className="p-4">
+              <div className="space-y-2">
+                {cart.map((item) => (
+                  <div key={item.id} className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <ShoppingBag className="h-4 w-4 mr-2 text-gray-500" />
+                      <span className="text-sm">
+                        {item.title} {item.size && `(${item.size})`} x {item.quantity}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium">
+                      ৳{formatCurrency(calculateItemTotal(item))}
+                    </span>
+                  </div>
+                ))}
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Subtotal</span>
+                    <span className="text-sm">৳{formatCurrency(calculateSubtotal())}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Shipping ({selectedShipping.label})</span>
+                    <span className="text-sm">৳{selectedShipping.price}</span>
+                  </div>
+                  <div className="flex justify-between items-center font-bold mt-1">
+                    <span>Total</span>
+                    <span>৳{formatCurrency(calculateTotal())}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <div>
-          <Label htmlFor="street-address">Street Address *</Label>
-          <Input 
-            id="street-address" 
-            placeholder="House number and street name" 
-            value={formData.streetAddress}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="city">Town / City *</Label>
-          <Input 
-            id="city" 
-            placeholder="Enter your city" 
-            value={formData.city}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="phone">Phone *</Label>
-          <Input 
-            id="phone" 
-            placeholder="Enter your phone number" 
-            value={formData.phone}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="email">Email Address *</Label>
-          <Input 
-            id="email" 
-            type="email" 
-            placeholder="Enter your email" 
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="shipping-option">Shipping Option *</Label>
-          <select 
-            id="shipping-option" 
-            className="w-full p-2 border rounded-md"
-            value={formData.shippingOption}
-            onChange={handleShippingChange}
-          >
-            {shippingOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label} - ৳{option.price}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      )}
 
-      <h2 className="text-2xl font-bold mb-4">Your Order</h2>
-      <Card className="mb-6">
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cart.length > 0 ? (
-                cart.map((item) => {
-                  // For display purposes, prefer discount price if available
-                  const unitPrice = item.discountPrice !== null 
-                    ? getNumericPrice(item.discountPrice) 
-                    : getNumericPrice(item.price);
-                    
-                  const itemTotal = calculateItemTotal(item);
-                  
-                  return (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.title} {item.size && `(${item.size})`}</TableCell>
-                      <TableCell>৳{formatCurrency(unitPrice || 0)}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell className="text-right">৳{formatCurrency(itemTotal)}</TableCell>
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-7/12">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4">Billing Details</h2>
+          <div className="grid grid-cols-1 gap-4 mb-6">
+            <div>
+              <Label htmlFor="full-name">Full Name *</Label>
+              <Input 
+                id="full-name" 
+                placeholder="Enter your full name" 
+                value={formData.fullName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="street-address">Street Address *</Label>
+              <Input 
+                id="street-address" 
+                placeholder="House number and street name" 
+                value={formData.streetAddress}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="city">Town / City *</Label>
+              <Input 
+                id="city" 
+                placeholder="Enter your city" 
+                value={formData.city}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone *</Label>
+              <Input 
+                id="phone" 
+                placeholder="Enter your phone number" 
+                value={formData.phone}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email Address *</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="Enter your email" 
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="shipping-option">Shipping Option *</Label>
+              <select 
+                id="shipping-option" 
+                className="w-full p-2 border rounded-md"
+                value={formData.shippingOption}
+                onChange={handleShippingChange}
+              >
+                {shippingOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label} - ৳{option.price}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full md:w-5/12">
+          <div className="hidden md:block">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Your Order</h2>
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Product</TableHead>
+                      <TableHead className="text-right">Total</TableHead>
                     </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-4">Your cart is empty</TableCell>
-                </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {cart.length > 0 ? (
+                      cart.map((item) => {
+                        const itemTotal = calculateItemTotal(item);
+                        
+                        return (
+                          <TableRow key={item.id}>
+                            <TableCell className="py-2">
+                              {item.title} {item.size && `(${item.size})`}
+                              <span className="block text-xs text-gray-500">
+                                x{item.quantity}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right py-2">৳{formatCurrency(itemTotal)}</TableCell>
+                          </TableRow>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={2} className="text-center py-4">Your cart is empty</TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      <TableCell className="font-medium py-2">Subtotal</TableCell>
+                      <TableCell className="text-right py-2">৳{formatCurrency(calculateSubtotal())}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium py-2">Shipping ({selectedShipping.label})</TableCell>
+                      <TableCell className="text-right py-2">৳{selectedShipping.price}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-bold text-lg py-2">Total</TableCell>
+                      <TableCell className="text-right font-bold text-lg py-2">৳{formatCurrency(calculateTotal())}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="p-4 border rounded-md mb-4 border-amber-900 bg-amber-600 text-white">
+            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay using bKash *SEND MONEY*</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-bold text-lg sm:text-xl">bKash: 01701503990</p>
+              <button 
+                onClick={copyBkashNumber}
+                className="p-1.5 sm:p-2 rounded-md bg-white/20 hover:bg-white/30 transition-colors flex items-center"
+                aria-label="Copy bKash number"
+              >
+                {copying ? (
+                  <>
+                    <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="text-xs sm:text-sm">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                    <span className="text-xs sm:text-sm">Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
+            
+            <div className="mt-4">
+              <Label htmlFor="transaction-id" className="text-white text-sm sm:text-base">
+                bKash Transaction ID *
+              </Label>
+              <div className="flex mt-1">
+                <div className="relative flex-grow">
+                  <CreditCard className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-800" />
+                  <Input
+                    id="transaction-id"
+                    placeholder="Enter your bKash Transaction ID"
+                    value={transactionId}
+                    onChange={handleTransactionIdChange}
+                    className="pl-8 bg-white/90 text-amber-900 placeholder:text-amber-700/60 border-amber-800"
+                    required
+                  />
+                </div>
+              </div>
+              {transactionIdError && (
+                <p className="text-xs text-amber-200 mt-1">{transactionIdError}</p>
               )}
-              <TableRow>
-                <TableCell colSpan={3} className="font-bold">Subtotal</TableCell>
-                <TableCell className="text-right">৳{formatCurrency(calculateSubtotal())}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell colSpan={3} className="font-bold">Shipping ({selectedShipping.label})</TableCell>
-                <TableCell className="text-right">৳{selectedShipping.price}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell colSpan={3} className="font-bold text-lg">Total</TableCell>
-                <TableCell className="text-right font-bold text-lg">৳{formatCurrency(calculateTotal())}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              <p className="text-xs text-amber-200 mt-1">
+                After making payment via bKash, enter the Transaction ID you received.
+              </p>
+            </div>
+          </div>
 
-      <div className="p-4 border rounded-md mb-4 border-amber-900">
-        <p>To confirm your order please pay using bKash</p>
-      </div>
-
-      {isCartEmpty ? (
-        <div className="text-center mb-6">
-          <p className="text-lg text-red-600 mb-4">Your cart is empty. Please add items to place an order.</p>
-          <Button 
-            className="w-full bg-blue-600 hover:bg-blue-700" 
-            onClick={handleGoToProducts}
-          >
-            Browse Products
-          </Button>
+          {isCartEmpty ? (
+            <div className="text-center mb-6">
+              <p className="text-base sm:text-lg text-red-600 mb-4">Your cart is empty. Please add items to place an order.</p>
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700" 
+                onClick={handleGoToProducts}
+              >
+                Browse Products
+              </Button>
+            </div>
+          ) : (
+            <Button 
+              className="w-full py-2.5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-base sm:text-lg" 
+              onClick={handlePlaceOrder}
+              disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email || !transactionId.trim()}
+            >
+              Place Order
+            </Button>
+          )}
+          
+          {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || formData.email === '' || !transactionId.trim()) && (
+            <p className="text-xs sm:text-sm text-red-500 text-center mt-2">
+              Please fill in all required fields including bKash Transaction ID to place your order
+            </p>
+          )}
         </div>
-      ) : (
-        <Button 
-          className="w-full bg-amber-600 hover:bg-amber-700" 
-          onClick={handlePlaceOrder}
-          disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email}
-        >
-          Place Order
-        </Button>
-      )}
-      
-      {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || formData.email === '') && (
-        <p className="text-sm text-red-500 text-center mt-2">
-          Please fill in all required fields to place your order
-        </p>
-      )}
+      </div>
     </div>
   );
 };

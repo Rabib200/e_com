@@ -1,10 +1,11 @@
+import { OrderStatus } from "@/lib/orderStatus.enum";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 // Define interfaces for type safety
 interface PaymentDetails {
-    trxID?: string;
+    transactionId?: string;
     paymentID?: string;
     amount?: number | string;
     currency?: string;
@@ -82,10 +83,11 @@ export async function POST(request: Request) {
                 city: orderData.customerInfo.city,
                 paid_amount: totalAmount,
                 payment_status: orderData.paymentDetails.transactionStatus ||
-                    "Completed",
+                    "Pending",
                 payment_id: orderData.paymentDetails.paymentID,
-                transaction_id: orderData.paymentDetails.trxID,
+                transaction_id: orderData.paymentDetails.transactionId,
                 payment_method: "bkash",
+                status: OrderStatus.PENDING,
             })
             .select()
             .single();
@@ -178,6 +180,85 @@ export async function POST(request: Request) {
         const errorMessage = typedError.response?.data?.error ||
             typedError.message ||
             "Failed to process order";
+
+        return new Response(JSON.stringify({ error: errorMessage }), {
+            status: statusCode,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+}
+
+export async function GET(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const orderId = searchParams.get("orderId");
+
+        if (!orderId) {
+            return NextResponse.json(
+                { error: "Order ID is required" },
+                { status: 400 },
+            );
+        }
+
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !supabaseAnonKey) {
+            throw new Error("Supabase environment variables not set");
+        }
+
+        // Initialize Supabase client
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+        // Fetch order details
+        const { data: order, error: orderError } = await supabase
+            .from("orders")
+            .select("*")
+            .eq("id", orderId)
+            .single();
+
+        if (orderError) {
+            console.error("Error fetching order:", orderError);
+            return NextResponse.json(
+                { error: `Failed to fetch order: ${orderError.message}` },
+                { status: 500 },
+            );
+        }
+
+        // Fetch order items
+        const { data: items, error: itemsError } = await supabase
+            .from("order_items")
+            .select("*")
+            .eq("order_id", orderId);
+
+        if (itemsError) {
+            console.error("Error fetching order items:", itemsError);
+            return NextResponse.json(
+                {
+                    error:
+                        `Failed to fetch order items: ${itemsError.message}`,
+                },
+                { status: 500 },
+            );
+        }
+
+        // Combine order and items data
+        const responseData = {
+            ...order,
+            items,
+        };
+
+        return NextResponse.json(responseData);
+    } catch (error: unknown) {
+        console.error("Error fetching order:", error);
+
+        const typedError = error as ErrorWithResponse;
+        // Return appropriate error message and status
+        const statusCode = typedError.response?.status || 500;
+        const errorMessage =
+            typedError.response?.data?.error ||
+            typedError.message ||
+            "Failed to fetch order";
 
         return new Response(JSON.stringify({ error: errorMessage }), {
             status: statusCode,
