@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   FaFacebook,
   FaTwitter,
@@ -676,144 +676,176 @@ const Home = () => {
   return (
     <div>
       <Header />
-      <main className="p-8 mt-24">
-        {" "}
-        {/* Adjusted margin-top to avoid content being hidden behind the fixed header */}
-        <section className="bg-gray-100 p-6 rounded-lg text-center">
-          <Carousel autoPlay autoPlayInterval={5000}>
-            <CarouselContent>
-              <CarouselItem>
-                <Image
-                  src="/banner1.webp"
-                  alt="Eid Banner"
-                  width={2000}
-                  height={2000}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem>
-                <Image
-                  src="/banner2.webp"
-                  alt="Live Now Banner"
-                  width={2000}
-                  height={2000}
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem>
-                <Image
-                  src="/banner3.webp"
-                  alt="Flash Sale Banner"
-                  width={2000}
-                  height={2000}
-                  priority
-                />
-              </CarouselItem>
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
+      <main className="p-4 sm:p-8 mt-24">
+        {/* Hero Section with Enhanced Carousel and Text */}
+        <section className="bg-gradient-to-br from-gray-50 to-gray-200 p-4 sm:p-6 rounded-lg shadow-md">
+          {/* Larger Carousel for Mobile */}
+          <div className="mb-6 sm:mb-8">
+            <Carousel autoPlay autoPlayInterval={5000} className="w-full">
+              <CarouselContent>
+                <CarouselItem>
+                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                    <Image
+                      src="/banner1.webp"
+                      alt="Eid Banner"
+                      fill
+                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      className="w-full h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                    <Image
+                      src="/banner2.webp"
+                      alt="Live Now Banner"
+                      fill
+                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      className="w-full h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                    <Image
+                      src="/banner3.webp"
+                      alt="Flash Sale Banner"
+                      fill
+                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      className="w-full h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          </div>
 
-          <p className="text-gray-600 text-5xl font-stretch-50% fill-amber-800">
-            Explore the best headgear collection
-          </p>
-          <Button className="mt-4 hover:bg-amber-600">Shop Now</Button>
+          {/* Enhanced and Responsive Text */}
+          <div className="text-center px-3 py-6 sm:py-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 mb-4">
+              Explore the Best Headgear Collection
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
+              Discover premium quality jerseys, stylish t-shirts, and fashionable sportswear for every occasion. Authentic designs with unmatched comfort.
+            </p>
+            <Button className="px-6 py-3 bg-amber-600 hover:bg-amber-700 transition-all duration-300 text-white text-base sm:text-lg rounded-md shadow-md hover:shadow-lg transform hover:-translate-y-1">
+              Shop Now
+            </Button>
+          </div>
         </section>
-        <h6 className="flex justify-center mt-10">
-          <b className="text-5xl font-stretch-50% fill-amber-800">
+
+        <h6 className="flex justify-center mt-10 sm:mt-16">
+          <b className="text-3xl sm:text-5xl font-stretch-50% fill-amber-800">
             TRENDING !!!
           </b>
         </h6>
         <div className="flex justify-center mt-8">
-          <Carousel autoPlay autoPlayInterval={3000}>
+          <Carousel autoPlay autoPlayInterval={3000} className="w-full">
             <CarouselContent>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p2.webp"
                   alt="Product 2"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p1.webp"
                   alt="Product 1"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p2.webp"
                   alt="Product 2"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
-              <CarouselItem className="basis-1/5">
+              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                 <Image
                   src="/p3.webp"
                   alt="Product 3"
                   width={400}
                   height={400}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="h-48 sm:h-64 w-full object-cover rounded-md"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   priority
                 />
               </CarouselItem>
@@ -827,30 +859,30 @@ const Home = () => {
             NEW ARRIVALS !!!
           </b>
         </h6>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 mt-8">
           {products.map((product, index) => (
-            <Card key={index} className="p-4">
-              <CardContent>
-                <div className="w-full h-64 relative">
+            <Card 
+              key={index} 
+              className="p-2 sm:p-4 overflow-hidden cursor-pointer"
+              onClick={() => handleBuyNow(product.slug)}
+            >
+              <CardContent className="p-0 sm:p-2">
+                <div className="w-full h-32 sm:h-48 md:h-64 relative overflow-hidden">
                   <Image
                     src={product.image[0] || "/placeholder.webp"}
                     alt={product.title || "Product"}
-                    layout="fill"
-                    objectFit="cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    width={400}
+                    height={400}
+                    className="w-full h-full object-cover"
                     priority
                   />
                 </div>
-                <CardTitle>{product.title || "Product"}</CardTitle>
-                <p className="text-gray-600">
-                  {product.description || "Description"}
-                </p>
-                <Button
-                  className="mt-4"
-                  onClick={() => handleBuyNow(product.slug)}
-                >
-                  Buy Now
-                </Button>
+                <div className="mt-2">
+                  <h3 className="text-sm sm:text-base font-semibold line-clamp-1">{product.title || "Product"}</h3>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+                    {product.description || "Description"}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}

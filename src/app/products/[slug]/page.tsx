@@ -14,13 +14,20 @@ import { CartItem } from "@/lib/types";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface Product {
   id: UUID;
   slug: string;
   title: string;
   description: string;
-  image: string;
+  image: string[];
   discount?: number;
   discountPrice?: number;
   price: number;
@@ -33,11 +40,18 @@ export default function ProductDetails() {
   const [product, setProduct] = useState<Product>();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Load cart from localStorage
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCart(storedCart);
+    try {
+      const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      // Ensure cart is always an array
+      setCart(Array.isArray(storedCart) ? storedCart : []);
+    } catch (error) {
+      console.error("Error parsing cart from localStorage:", error);
+      setCart([]);
+    }
   }, []);
 
   // Fetch product by slug using Axios
@@ -107,65 +121,132 @@ export default function ProductDetails() {
   }
 
   return (
-    <main className="p-8 mt-24 flex justify-center">
-      <Card className="max-w-2xl w-full p-6 shadow-md">
-        <CardContent className="space-y-4">
-          <div className="w-full h-80 relative rounded-lg overflow-hidden">
-            <Image
-              src={product.image[0]}
-              alt={product.title}
-              fill
-              style={{ objectFit: "cover" }}
-              priority
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <CardTitle>{product.title}</CardTitle>
-            {product.discount && (
-              <div className="badge badge-destructive">
-                {product.discount}% OFF
+    <main className="p-4 sm:p-8 mt-24 flex justify-center">
+      <Card className="max-w-4xl w-full p-3 sm:p-6 shadow-md">
+        <CardContent className="space-y-6">
+          {/* Product Image Carousel */}
+          <div className="w-full relative mb-4">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {product.image.map((img, index) => (
+                  <CarouselItem key={index}>
+                    <div className="aspect-square sm:aspect-[4/3] md:aspect-[16/9] relative rounded-lg overflow-hidden">
+                      <Image
+                        src={img}
+                        alt={`${product.title} - Image ${index + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        style={{ objectFit: "cover" }}
+                        priority={index === 0}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2 h-8 w-8" />
+              <CarouselNext className="right-2 h-8 w-8" />
+            </Carousel>
+            
+            {/* Thumbnail Navigation (visible on larger screens) */}
+            {product.image.length > 1 && (
+              <div className="hidden sm:flex mt-4 space-x-2 justify-center">
+                {product.image.map((img, index) => (
+                  <div 
+                    key={`thumb-${index}`}
+                    className={`cursor-pointer w-16 h-16 relative rounded-md overflow-hidden border-2 transition-all ${
+                      currentImageIndex === index 
+                        ? "border-amber-600 opacity-100" 
+                        : "border-transparent opacity-70 hover:opacity-100"
+                    }`}
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      // Find and click the carousel navigation button
+                      const buttons = document.querySelectorAll('[data-carousel-button]');
+                      if (buttons && buttons.length >= 2) {
+                        // This is a workaround - in a real implementation, you would use a ref to control the carousel
+                        const diff = index - currentImageIndex;
+                        const clickCount = Math.abs(diff);
+                        const buttonIndex = diff > 0 ? 1 : 0; // 0 for prev, 1 for next
+                        
+                        for (let i = 0; i < clickCount; i++) {
+                          setTimeout(() => {
+                            (buttons[buttonIndex] as HTMLButtonElement).click();
+                          }, i * 100);
+                        }
+                      }
+                    }}
+                  >
+                    <Image
+                      src={img}
+                      alt={`Thumbnail ${index + 1}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </div>
-          <div className="flex items-center space-x-2 text-lg font-semibold">
-            {product.discountPrice ? (
-              <>
-                <span className="text-red-500">${product.discountPrice}</span>
-                <span className="line-through text-gray-500">
-                  ${product.price}
-                </span>
-              </>
-            ) : (
-              <span className="text-gray-500">${product.price}</span>
-            )}
-          </div>
-          <CardDescription>{product.description}</CardDescription>
-
-          {/* Size Selection */}
-          <div className="space-y-2">
-            <h3 className="font-medium">Select Size</h3>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes &&
-                product.sizes.map((size) => (
-                  <Button
-                    key={size}
-                    variant={selectedSize === size ? "default" : "outline"}
-                    className={`px-4 py-2 ${
-                      selectedSize === size
-                        ? "bg-primary text-primary-foreground"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </Button>
-                ))}
+          
+          {/* Product Info */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl sm:text-2xl">{product.title}</CardTitle>
+              {product.discount && (
+                <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
+                  {product.discount}% OFF
+                </div>
+              )}
             </div>
+            
+            <div className="flex items-center space-x-2 text-lg sm:text-xl font-semibold">
+              {product.discountPrice ? (
+                <>
+                  <span className="text-red-500">৳{product.discountPrice}</span>
+                  <span className="line-through text-gray-500">
+                    ৳{product.price}
+                  </span>
+                </>
+              ) : (
+                <span className="text-gray-700">৳{product.price}</span>
+              )}
+            </div>
+            
+            <CardDescription className="text-sm sm:text-base py-2">
+              {product.description}
+            </CardDescription>
+
+            {/* Size Selection */}
+            <div className="space-y-2 py-2">
+              <h3 className="font-medium">Select Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes &&
+                  product.sizes.map((size) => (
+                    <Button
+                      key={size}
+                      variant={selectedSize === size ? "default" : "outline"}
+                      className={`px-3 py-1 sm:px-4 sm:py-2 text-sm ${
+                        selectedSize === size
+                          ? "bg-amber-600 text-white hover:bg-amber-700"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </Button>
+                  ))}
+              </div>
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <Button 
+              className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium" 
+              onClick={addToCart}
+            >
+              Add to Cart
+            </Button>
           </div>
-          <Separator />
-          <Button className="w-full" onClick={addToCart}>
-            Add to Cart
-          </Button>
         </CardContent>
       </Card>
     </main>

@@ -33,6 +33,9 @@ function CallbackClient() {
         const customerInfo = JSON.parse(localStorage.getItem('customerInfo') || '{}');
         const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
         
+        // Ensure cartItems is an array
+        const validCartItems = Array.isArray(cartItems) ? cartItems : [];
+        
         // Validate required customer information
         if (!customerInfo.fullName || !customerInfo.streetAddress || !customerInfo.city) {
           console.error('Missing required customer information');
@@ -40,14 +43,14 @@ function CallbackClient() {
         }
         
         // Validate cart items
-        if (!cartItems || cartItems.length === 0) {
+        if (!validCartItems.length) {
           console.error('Cart is empty');
           return false;
         }
         
         // Ensure amount is available - fix the type issue with proper type checking
         const totalAmount = paymentDetails.amount || 
-          cartItems.reduce((total: number, item: CartItem) => {
+          validCartItems.reduce((total: number, item: CartItem) => {
             // Safe type handling for price
             let price: number;
             if (typeof item.price === 'string') {
@@ -66,7 +69,7 @@ function CallbackClient() {
         const orderData = {
           paymentDetails,
           customerInfo,
-          items: cartItems,
+          items: validCartItems,
           orderDate: new Date().toISOString(),
           totalAmount: totalAmount
         };

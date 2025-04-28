@@ -44,15 +44,23 @@ const BillingPage = () => {
       const savedCart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
       if (Array.isArray(savedCart)) {
         setCart(savedCart);
+      } else {
+        // If cart isn't an array, initialize it as empty array
+        console.error("Cart from localStorage is not an array");
+        setCart([]);
       }
       
       const savedShippingOption = localStorage.getItem("shippingOption");
       if (savedShippingOption) {
-        const parsedOption = JSON.parse(savedShippingOption);
-        const option = shippingOptions.find(opt => opt.id === parsedOption.id);
-        if (option) {
-          setSelectedShipping(option);
-          setFormData(prev => ({ ...prev, shippingOption: option.id }));
+        try {
+          const parsedOption = JSON.parse(savedShippingOption);
+          const option = shippingOptions.find(opt => opt.id === parsedOption.id);
+          if (option) {
+            setSelectedShipping(option);
+            setFormData(prev => ({ ...prev, shippingOption: option.id }));
+          }
+        } catch (error) {
+          console.error("Error parsing saved shipping option:", error);
         }
       }
     } catch (error) {
