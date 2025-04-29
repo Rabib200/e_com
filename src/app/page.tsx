@@ -189,7 +189,9 @@ const Header = () => {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
-          <h1 className="text-2xl font-bold"><Link href={'/'}>Headgear BD</Link></h1>
+          <h1 className="text-2xl font-bold">
+            <Link href={"/"}>Headgear BD</Link>
+          </h1>
         </div>
 
         {/* Mobile Navigation */}
@@ -651,10 +653,15 @@ interface Product {
   description: string;
   slug: string;
   category: string;
+  status?: string;
+  inStock?: boolean;
+  price?: number;
+  discountPrice?: number;
 }
 
 const Home = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [trending, setTrending] = useState<Product[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -668,10 +675,28 @@ const Home = () => {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const fetchTrendingProducts = async () => {
+      try {
+        const response = await axiosInstance.get("/products?isTrending=eq.true");
+        setTrending(response.data);
+      } catch (error) {
+        console.error("Error fetching trending products:", error);
+      }
+    };
+    fetchTrendingProducts();
+  }, []);
+
   function handleBuyNow(slug: string) {
     console.log("Buy Now Clicked for product:", slug);
     router.push(`/products/${slug}`);
   }
+
+  // Function to check if a product is out of stock - only use status field
+  const isOutOfStock = (product: Product) => {
+    return product.status === "Out_of_Stock";
+  };
 
   return (
     <div>
@@ -689,7 +714,10 @@ const Home = () => {
                       src="/banner1.webp"
                       alt="Eid Banner"
                       fill
-                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#f8f8f8",
+                      }}
                       className="w-full h-full"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
                       priority
@@ -702,7 +730,10 @@ const Home = () => {
                       src="/banner2.webp"
                       alt="Live Now Banner"
                       fill
-                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#f8f8f8",
+                      }}
                       className="w-full h-full"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
                       priority
@@ -715,7 +746,10 @@ const Home = () => {
                       src="/banner3.webp"
                       alt="Flash Sale Banner"
                       fill
-                      style={{ objectFit: 'contain', backgroundColor: '#f8f8f8' }}
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#f8f8f8",
+                      }}
                       className="w-full h-full"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
                       priority
@@ -734,7 +768,9 @@ const Home = () => {
               Explore the Best Headgear Collection
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
-              Discover premium quality jerseys, stylish t-shirts, and fashionable sportswear for every occasion. Authentic designs with unmatched comfort.
+              Discover premium quality jerseys, stylish t-shirts, and
+              fashionable sportswear for every occasion. Authentic designs with
+              unmatched comfort.
             </p>
             <Button className="px-6 py-3 bg-amber-600 hover:bg-amber-700 transition-all duration-300 text-white text-base sm:text-lg rounded-md shadow-md hover:shadow-lg transform hover:-translate-y-1">
               Shop Now
@@ -750,105 +786,64 @@ const Home = () => {
         <div className="flex justify-center mt-8">
           <Carousel autoPlay autoPlayInterval={3000} className="w-full">
             <CarouselContent>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p2.webp"
-                  alt="Product 2"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p1.webp"
-                  alt="Product 1"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p2.webp"
-                  alt="Product 2"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
-              <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                <Image
-                  src="/p3.webp"
-                  alt="Product 3"
-                  width={400}
-                  height={400}
-                  className="h-48 sm:h-64 w-full object-cover rounded-md"
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                  priority
-                />
-              </CarouselItem>
+              {trending.length > 0 ? (
+                trending.map((product, index) => (
+                  <CarouselItem 
+                    key={product.id} 
+                    className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5"
+                    onClick={() => handleBuyNow(product.slug)}
+                  >
+                    <div className="relative h-48 sm:h-64 w-full cursor-pointer">
+                      <Image
+                        src={product.image[0] || "/placeholder.webp"}
+                        alt={product.title || `Trending Product ${index + 1}`}
+                        width={400}
+                        height={400}
+                        className="h-full w-full object-cover rounded-md"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        priority
+                      />
+                    </div>
+                  </CarouselItem>
+                ))
+              ) : (
+                // Fallback images if no trending products are loaded
+                <>
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
+                    <Image
+                      src="/p1.webp"
+                      alt="Product 1"
+                      width={400}
+                      height={400}
+                      className="h-48 sm:h-64 w-full object-cover rounded-md"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      priority
+                    />
+                  </CarouselItem>
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
+                    <Image
+                      src="/p2.webp"
+                      alt="Product 2"
+                      width={400}
+                      height={400}
+                      className="h-48 sm:h-64 w-full object-cover rounded-md"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      priority
+                    />
+                  </CarouselItem>
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
+                    <Image
+                      src="/p3.webp"
+                      alt="Product 3"
+                      width={400}
+                      height={400}
+                      className="h-48 sm:h-64 w-full object-cover rounded-md"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      priority
+                    />
+                  </CarouselItem>
+                </>
+              )}
             </CarouselContent>
             <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
             <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
@@ -860,34 +855,82 @@ const Home = () => {
           </b>
         </h6>
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 mt-8">
-          {products.map((product, index) => (
-            <Card 
-              key={index} 
-              className="p-2 sm:p-4 overflow-hidden cursor-pointer"
-              onClick={() => handleBuyNow(product.slug)}
-            >
-              <CardContent className="p-0 sm:p-2">
-                <div className="w-full h-32 sm:h-48 md:h-64 relative overflow-hidden">
-                  <Image
-                    src={product.image[0] || "/placeholder.webp"}
-                    alt={product.title || "Product"}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-cover"
-                    priority
-                  />
-                </div>
-                <div className="mt-2">
-                  <h3 className="text-sm sm:text-base font-semibold line-clamp-1">{product.title || "Product"}</h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
-                    {product.description || "Description"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {products.map((product, index) => {
+            const outOfStock = isOutOfStock(product);
+
+            return (
+              <Card
+                key={index}
+                className={`p-2 sm:p-4 overflow-hidden cursor-pointer ${
+                  outOfStock ? "opacity-90" : ""
+                }`}
+                onClick={() => handleBuyNow(product.slug)}
+              >
+                <CardContent className="p-0 sm:p-2">
+                  <div className="w-full h-32 sm:h-48 md:h-64 relative overflow-hidden">
+                    <Image
+                      src={product.image[0] || "/placeholder.webp"}
+                      alt={product.title || "Product"}
+                      width={400}
+                      height={400}
+                      className={`w-full h-full object-cover ${
+                        outOfStock ? "opacity-80 grayscale-[30%]" : ""
+                      }`}
+                      priority
+                    />
+
+                    {/* Out of Stock Overlay */}
+                    {outOfStock && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="bg-black bg-opacity-70 text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
+                          Out of Stock
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm sm:text-base font-semibold line-clamp-1">
+                        {product.title || "Product"}
+                      </h3>
+                      {outOfStock && (
+                        <span className="px-1.5 py-0.5 bg-red-600 text-white text-[10px] sm:text-xs font-medium rounded">
+                          Out of Stock
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Price Display */}
+                    {(product.price || product.discountPrice) && (
+                      <div className="flex items-center space-x-1 text-sm mt-1">
+                        {product.discountPrice ? (
+                          <>
+                            <span className="text-red-500 font-medium">
+                              ৳{product.discountPrice}
+                            </span>
+                            <span className="line-through text-gray-500 text-xs">
+                              ৳{product.price}
+                            </span>
+                          </>
+                        ) : product.price ? (
+                          <span className="text-gray-700 font-medium">
+                            ৳{product.price}
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
+
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+                      {product.description || "Description"}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

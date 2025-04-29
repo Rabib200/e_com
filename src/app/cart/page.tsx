@@ -6,10 +6,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@/lib/types";
+import { axiosInstance } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const CartPage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [stockStatus, setStockStatus] = useState<Record<string, boolean>>({});
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   // Ensure client-side rendering
@@ -35,12 +39,65 @@ const CartPage = () => {
     }
   }, [isClient]);
 
+  // Check stock status for each product in cart
+  useEffect(() => {
+    const checkStockStatus = async () => {
+      if (cart.length === 0) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Extract unique product slugs from cart
+        const slugs = [...new Set(cart.map(item => item.slug))];
+        
+        // Fetch stock status for all products in a single request
+        const { data } = await axiosInstance.get(
+          `/products?slug=in.(${slugs.join(',')})&select=slug,status,inStock`
+        );
+        
+        const statusMap: Record<string, boolean> = {};
+        
+        // Process the response
+        if (Array.isArray(data)) {
+          data.forEach(product => {
+            // Only check for the specific "Out_of_Stock" status
+            const isInStock = product.status !== "Out_of_Stock";
+            statusMap[product.slug] = isInStock;
+          });
+        }
+        
+        setStockStatus(statusMap);
+      } catch (error) {
+        console.error("Error checking stock status:", error);
+        // If there's an error, we'll assume all products are in stock
+        const defaultStatus: Record<string, boolean> = {};
+        cart.forEach(item => {
+          defaultStatus[item.slug] = true;
+        });
+        setStockStatus(defaultStatus);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isClient && cart.length > 0) {
+      checkStockStatus();
+    } else {
+      setIsLoading(false);
+    }
+  }, [cart, isClient]);
+
   // Sync cart state with localStorage
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("cart", JSON.stringify(cart));
     }
   }, [cart, isClient]);
+
+  const isItemInStock = (item: CartItem) => {
+    return stockStatus[item.slug] !== false;
+  };
 
   const updateQuantity = (id: string, quantity: number) => {
     setCart((prevCart) => 
@@ -59,6 +116,17 @@ const CartPage = () => {
   };
 
   const handleBillingOrder = () => {
+    // Check if any items in cart are out of stock
+    const outOfStockItems = cart.filter(item => !isItemInStock(item));
+    
+    if (outOfStockItems.length > 0) {
+      toast.error("Some items in your cart are out of stock", {
+        description: "Please remove out-of-stock items before proceeding to checkout.",
+        duration: 5000,
+      });
+      return;
+    }
+    
     console.log("Proceeding to billing");
     router.push("/billing");
   };
@@ -72,7 +140,7 @@ const CartPage = () => {
   
   const subtotal = calculateSubtotal();
 
-  if (!isClient) {
+  if (!isClient || isLoading) {
     return (
       <div className="container mx-auto p-6 mt-24">
         <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
@@ -100,31 +168,53 @@ const CartPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cart.length > 0 ? cart.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <div className="w-16 h-16 relative">
-                    <Image src={item.image[0]} alt={item.title} fill style={{ objectFit: "cover" }} />
-                  </div>
-                </TableCell>
-                <TableCell>{item.title}</TableCell>
-                <TableCell>{item.size || "N/A"}</TableCell>
-                <TableCell>${item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
-                <TableCell>
-                  <input
-                    type="number"
-                    className="w-16 border p-1 rounded-md text-center"
-                    value={item.quantity || 1}
-                    min={1}
-                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
-                  />
-                </TableCell>
-                <TableCell>${item.discountPrice ? (item.discountPrice * (item.quantity)) : (item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
-                <TableCell>
-                  <Button variant="destructive" onClick={() => removeFromCart(item.id)}>Remove</Button>
-                </TableCell>
-              </TableRow>
-            )) : (
+            {cart.length > 0 ? cart.map((item) => {
+              const inStock = isItemInStock(item);
+              return (
+                <TableRow key={item.id} className={!inStock ? "bg-red-50" : ""}>
+                  <TableCell>
+                    <div className="w-16 h-16 relative">
+                      <Image 
+                        src={item.image[0]} 
+                        alt={item.title} 
+                        fill 
+                        style={{ objectFit: "cover" }} 
+                        className={!inStock ? "opacity-60" : ""}
+                      />
+                      {!inStock && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="bg-red-600 text-white text-xs px-1 py-0.5 rounded rotate-[-10deg]">Out of Stock</span>
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {item.title}
+                    {!inStock && (
+                      <p className="text-red-600 text-xs mt-1">This item is currently out of stock</p>
+                    )}
+                  </TableCell>
+                  <TableCell>{item.size || "N/A"}</TableCell>
+                  <TableCell>${item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <input
+                      type="number"
+                      className={`w-16 border p-1 rounded-md text-center ${!inStock ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                      value={item.quantity || 1}
+                      min={1}
+                      onChange={(e) => inStock && updateQuantity(item.id, parseInt(e.target.value))}
+                      disabled={!inStock}
+                    />
+                  </TableCell>
+                  <TableCell>${item.discountPrice ? (item.discountPrice * (item.quantity || 1)).toFixed(2) : (item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Button variant="destructive" onClick={() => removeFromCart(item.id)}>
+                      {!inStock ? "Remove (Out of Stock)" : "Remove"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            }) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4">Your cart is empty</TableCell>
               </TableRow>
@@ -150,7 +240,22 @@ const CartPage = () => {
                 <span>Total:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <Button className="mt-4 w-full bg-amber-600 hover:bg-amber-700" onClick={handleBillingOrder}>
+              
+              {/* Show warning if out-of-stock items exist */}
+              {cart.some(item => !isItemInStock(item)) && (
+                <div className="mt-3 p-2 border border-red-300 bg-red-50 rounded-md text-sm text-red-600">
+                  <p className="font-medium">Warning: Out of Stock Items</p>
+                  <p>Please remove out-of-stock items before proceeding to checkout.</p>
+                </div>
+              )}
+              
+              <Button 
+                className={`mt-4 w-full ${cart.some(item => !isItemInStock(item)) 
+                  ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed"
+                  : "bg-amber-600 hover:bg-amber-700"}`} 
+                onClick={handleBillingOrder}
+                disabled={cart.some(item => !isItemInStock(item))}
+              >
                 Proceed to Checkout
               </Button>
             </CardContent>

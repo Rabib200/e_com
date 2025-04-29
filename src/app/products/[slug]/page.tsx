@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { CartItem } from "@/lib/types";
+import { CartItem, ProductStatus } from "@/lib/types";
 import { toast } from "sonner";
 import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
@@ -32,6 +32,8 @@ interface Product {
   discountPrice?: number;
   price: number;
   sizes: string[];
+  status: ProductStatus;
+  inStock?: boolean; // Ensure this property exists
 }
 
 export default function ProductDetails() {
@@ -79,8 +81,14 @@ export default function ProductDetails() {
     fetchProduct();
   }, [slug]);
 
+  // Check if product is out of stock based on status
+  const isOutOfStock = React.useMemo(() => {
+    if (!product) return true;
+    return product.status === "Out_of_Stock";
+  }, [product]);
+
   const addToCart = () => {
-    if (!product || !selectedSize) return;
+    if (!product || !selectedSize || isOutOfStock) return;
 
     const cartItemId = `${product.id}-${selectedSize}`;
     const existingItem = cart.find((item) => item.id === cartItemId);
@@ -122,7 +130,7 @@ export default function ProductDetails() {
 
   return (
     <main className="p-4 sm:p-8 mt-24 flex justify-center">
-      <Card className="max-w-4xl w-full p-3 sm:p-6 shadow-md">
+      <Card className={`max-w-4xl w-full p-3 sm:p-6 shadow-md ${isOutOfStock ? 'opacity-90' : ''}`}>
         <CardContent className="space-y-6">
           {/* Product Image Carousel */}
           <div className="w-full relative mb-4">
@@ -138,7 +146,17 @@ export default function ProductDetails() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         style={{ objectFit: "cover" }}
                         priority={index === 0}
+                        className={isOutOfStock ? "opacity-80 grayscale-[30%]" : ""}
                       />
+                      
+                      {/* Overlay "Out of Stock" label on the image */}
+                      {isOutOfStock && index === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-lg font-bold transform rotate-[-15deg] shadow-lg">
+                            Out of Stock
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CarouselItem>
                 ))}
@@ -157,7 +175,7 @@ export default function ProductDetails() {
                       currentImageIndex === index 
                         ? "border-amber-600 opacity-100" 
                         : "border-transparent opacity-70 hover:opacity-100"
-                    }`}
+                    } ${isOutOfStock ? "grayscale-[30%]" : ""}`}
                     onClick={() => {
                       setCurrentImageIndex(index);
                       // Find and click the carousel navigation button
@@ -192,11 +210,18 @@ export default function ProductDetails() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl sm:text-2xl">{product.title}</CardTitle>
-              {product.discount && (
-                <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
-                  {product.discount}% OFF
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {isOutOfStock && (
+                  <div className="px-2 py-1 bg-red-600 text-white text-xs sm:text-sm font-bold rounded">
+                    Out of Stock
+                  </div>
+                )}
+                {product.discount && product.discount > 0 && (
+                  <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
+                    {product.discount}% OFF
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="flex items-center space-x-2 text-lg sm:text-xl font-semibold">
@@ -216,6 +241,13 @@ export default function ProductDetails() {
               {product.description}
             </CardDescription>
 
+            {/* Stock Status */}
+            <div className="py-2">
+              <p className={`text-sm font-medium ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                {isOutOfStock ? 'Currently Out of Stock' : 'In Stock'}
+              </p>
+            </div>
+
             {/* Size Selection */}
             <div className="space-y-2 py-2">
               <h3 className="font-medium">Select Size</h3>
@@ -229,8 +261,9 @@ export default function ProductDetails() {
                         selectedSize === size
                           ? "bg-amber-600 text-white hover:bg-amber-700"
                           : "hover:bg-gray-100"
-                      }`}
-                      onClick={() => setSelectedSize(size)}
+                      } ${isOutOfStock ? "opacity-60 cursor-not-allowed" : ""}`}
+                      onClick={() => !isOutOfStock && setSelectedSize(size)}
+                      disabled={isOutOfStock}
                     >
                       {size}
                     </Button>
@@ -241,10 +274,13 @@ export default function ProductDetails() {
             <Separator className="my-4" />
             
             <Button 
-              className="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium" 
+              className={`w-full py-2.5 ${isOutOfStock 
+                ? "bg-gray-400 hover:bg-gray-400" 
+                : "bg-amber-600 hover:bg-amber-700"} text-white font-medium`} 
               onClick={addToCart}
+              disabled={isOutOfStock}
             >
-              Add to Cart
+              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
             </Button>
           </div>
         </CardContent>
