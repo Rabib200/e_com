@@ -667,7 +667,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get("/products");
+        const response = await axiosInstance.get("/products?isAvailable=eq.true");
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -679,7 +679,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrendingProducts = async () => {
       try {
-        const response = await axiosInstance.get("/products?isTrending=eq.true");
+        const response = await axiosInstance.get("/products?isTrending=eq.true&isAvailable=eq.true");
         setTrending(response.data);
       } catch (error) {
         console.error("Error fetching trending products:", error);

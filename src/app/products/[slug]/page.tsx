@@ -71,9 +71,9 @@ export default function ProductDetails() {
       setIsLoadingSizes(true);
 
       try {
-        // Get product data first
+        // Get product data first with isAvailable=eq.true filter
         const { data } = await axiosInstance.get(
-          `/products?slug=eq.${slug}&select=*`
+          `/products?slug=eq.${slug}&isAvailable=eq.true&select=*`
         );
         
         if (data.length > 0) {

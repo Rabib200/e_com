@@ -53,9 +53,14 @@ const ProductsContent = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get(
-          `/products?category=eq.${category}&select=*`
-        );
+        let query = `/products?isAvailable=eq.true`;
+        
+        // Add category filter if provided
+        if (category) {
+          query += `&category=eq.${category}`;
+        }
+        
+        const response = await axiosInstance.get(`${query}&select=*`);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
