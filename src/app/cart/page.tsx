@@ -242,7 +242,7 @@ const CartPage = () => {
               </div>
               
               {/* Show warning if out-of-stock items exist */}
-              {cart.some(item => !isItemInStock(item)) && (
+              {cart.some((item: CartItem) => !isItemInStock(item)) && (
                 <div className="mt-3 p-2 border border-red-300 bg-red-50 rounded-md text-sm text-red-600">
                   <p className="font-medium">Warning: Out of Stock Items</p>
                   <p>Please remove out-of-stock items before proceeding to checkout.</p>
@@ -250,11 +250,11 @@ const CartPage = () => {
               )}
               
               <Button 
-                className={`mt-4 w-full ${cart.some(item => !isItemInStock(item)) 
+                className={`mt-4 w-full ${cart.some((item: CartItem) => !isItemInStock(item)) 
                   ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed"
                   : "bg-amber-600 hover:bg-amber-700"}`} 
                 onClick={handleBillingOrder}
-                disabled={cart.some(item => !isItemInStock(item))}
+                disabled={cart.some((item: CartItem) => !isItemInStock(item))}
               >
                 Proceed to Checkout
               </Button>

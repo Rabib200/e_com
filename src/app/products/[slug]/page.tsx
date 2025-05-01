@@ -36,6 +36,12 @@ interface Product {
   inStock?: boolean; // Ensure this property exists
 }
 
+interface SizeAvailability {
+  size: string;
+  stock: number;
+  product_id: UUID;
+}
+
 export default function ProductDetails() {
   const router = useRouter();
   const { slug } = useParams();
@@ -43,6 +49,8 @@ export default function ProductDetails() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [sizeAvailability, setSizeAvailability] = useState<SizeAvailability[]>([]);
+  const [isLoadingSizes, setIsLoadingSizes] = useState(true);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -60,26 +68,63 @@ export default function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!slug) return;
+      setIsLoadingSizes(true);
 
       try {
+        // Get product data first
         const { data } = await axiosInstance.get(
           `/products?slug=eq.${slug}&select=*`
         );
+        
         if (data.length > 0) {
-          setProduct(data[0]); // Set first matching product
-          if (data[0].sizes && data[0].sizes.length > 0) {
-            setSelectedSize(data[0].sizes[0]); // Set default size
+          const productData = data[0];
+          setProduct(productData); // Set product data
+          
+          // Now fetch sizes using our dedicated API endpoint
+          try {
+            const sizesResponse = await fetch(`/api/sizes/${productData.id}`);
+            const sizesData = await sizesResponse.json();
+            
+            if (sizesResponse.ok && sizesData.success) {
+              setSizeAvailability(sizesData.sizes);
+              
+              // Set the first size with available stock as the default selected size
+              const availableSize = sizesData.sizes.find((item: SizeAvailability) => item.stock > 0);
+              if (availableSize) {
+                setSelectedSize(availableSize.size);
+              } else if (sizesData.sizes.length > 0) {
+                // If no sizes have stock, still select the first one to show it as out of stock
+                setSelectedSize(sizesData.sizes[0].size);
+              }
+            } else {
+              console.error("Failed to fetch sizes:", sizesData.error);
+              setSizeAvailability([]);
+            }
+          } catch (sizesError) {
+            console.error("Error fetching sizes:", sizesError);
+            setSizeAvailability([]);
           }
         } else {
           console.error("Product not found");
+          setSizeAvailability([]);
         }
       } catch (error) {
         console.error("Error fetching product:", error);
+        setSizeAvailability([]);
+      } finally {
+        setIsLoadingSizes(false);
       }
     };
 
     fetchProduct();
   }, [slug]);
+
+  // Function to check if a specific size is in stock
+  const isSizeInStock = (size: string): boolean => {
+    const sizeData = sizeAvailability.find((item: SizeAvailability) => item.size === size);
+    if (!sizeData) return true; // Default to true if size not found in table
+    return sizeData.stock > 0;
+  };
 
   // Check if product is out of stock based on status
   const isOutOfStock = React.useMemo(() => {
@@ -88,14 +133,39 @@ export default function ProductDetails() {
   }, [product]);
 
   const addToCart = () => {
-    if (!product || !selectedSize || isOutOfStock) return;
+    if (!product || !selectedSize) return;
+    
+    // Check if the selected size is in stock
+    const isSizeAvailable = isSizeInStock(selectedSize);
+    if (!isSizeAvailable || isOutOfStock) {
+      toast.error("This size is currently out of stock", {
+        description: "Please select a different size or check back later.",
+        duration: 3000
+      });
+      return;
+    }
 
+    // Get size stock quantity
+    const sizeData = sizeAvailability.find((item: SizeAvailability) => item.size === selectedSize);
+    const stockQuantity = sizeData?.stock || 0;
+    
+    // Check existing cart items to prevent over-ordering
     const cartItemId = `${product.id}-${selectedSize}`;
-    const existingItem = cart.find((item) => item.id === cartItemId);
+    const existingItem = cart.find((item: CartItem) => item.id === cartItemId);
+    const currentQuantityInCart = existingItem?.quantity || 0;
+    
+    // Check if adding another item would exceed available stock
+    if (currentQuantityInCart >= stockQuantity) {
+      toast.error("Maximum available quantity reached", {
+        description: `Sorry, only ${stockQuantity} item(s) available in this size.`,
+        duration: 3000
+      });
+      return;
+    }
 
     let updatedCart;
     if (existingItem) {
-      updatedCart = cart.map((item) =>
+      updatedCart = cart.map((item: CartItem) =>
         item.id === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
@@ -114,7 +184,7 @@ export default function ProductDetails() {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     
     // Enhanced toast with action button
-    toast("Product added to cart", {
+    toast.success("Product added to cart", {
       description: `${product.title} (${selectedSize}) added to your shopping cart.`,
       action: {
         label: "View Cart",
@@ -136,7 +206,7 @@ export default function ProductDetails() {
           <div className="w-full relative mb-4">
             <Carousel className="w-full">
               <CarouselContent>
-                {product.image.map((img, index) => (
+                {product.image.map((img: string, index: number) => (
                   <CarouselItem key={index}>
                     <div className="aspect-square sm:aspect-[4/3] md:aspect-[16/9] relative rounded-lg overflow-hidden">
                       <Image
@@ -168,7 +238,7 @@ export default function ProductDetails() {
             {/* Thumbnail Navigation (visible on larger screens) */}
             {product.image.length > 1 && (
               <div className="hidden sm:flex mt-4 space-x-2 justify-center">
-                {product.image.map((img, index) => (
+                {product.image.map((img: string, index: number) => (
                   <div 
                     key={`thumb-${index}`}
                     className={`cursor-pointer w-16 h-16 relative rounded-md overflow-hidden border-2 transition-all ${
@@ -251,24 +321,35 @@ export default function ProductDetails() {
             {/* Size Selection */}
             <div className="space-y-2 py-2">
               <h3 className="font-medium">Select Size</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes &&
-                  product.sizes.map((size) => (
-                    <Button
-                      key={size}
-                      variant={selectedSize === size ? "default" : "outline"}
-                      className={`px-3 py-1 sm:px-4 sm:py-2 text-sm ${
-                        selectedSize === size
-                          ? "bg-amber-600 text-white hover:bg-amber-700"
-                          : "hover:bg-gray-100"
-                      } ${isOutOfStock ? "opacity-60 cursor-not-allowed" : ""}`}
-                      onClick={() => !isOutOfStock && setSelectedSize(size)}
-                      disabled={isOutOfStock}
-                    >
-                      {size}
-                    </Button>
-                  ))}
-              </div>
+              {isLoadingSizes ? (
+                <div className="py-2 text-sm text-gray-500">Loading size availability...</div>
+              ) : sizeAvailability.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {sizeAvailability.map((sizeData: SizeAvailability) => {
+                    const inStock = sizeData.stock > 0;
+                    
+                    return (
+                      <Button
+                        key={sizeData.size}
+                        variant={selectedSize === sizeData.size ? "default" : "outline"}
+                        className={`px-3 py-1 sm:px-4 sm:py-2 text-sm ${
+                          selectedSize === sizeData.size
+                            ? "bg-amber-600 text-white hover:bg-amber-700"
+                            : inStock 
+                              ? "hover:bg-gray-100" 
+                              : "opacity-60 cursor-not-allowed bg-gray-100"
+                        }`}
+                        onClick={() => !isOutOfStock && inStock && setSelectedSize(sizeData.size)}
+                        disabled={isOutOfStock || !inStock}
+                      >
+                        {sizeData.size}
+                      </Button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-2 text-sm text-gray-500">No sizes available for this product</div>
+              )}
             </div>
             
             <Separator className="my-4" />

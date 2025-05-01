@@ -711,6 +711,22 @@ const Home = () => {
                 <CarouselItem>
                   <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
                     <Image
+                      src="/mainBanner.jpg"
+                      alt="main Banner"
+                      fill
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#f8f8f8",
+                      }}
+                      className="w-full h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                    <Image
                       src="/banner1.webp"
                       alt="Eid Banner"
                       fill

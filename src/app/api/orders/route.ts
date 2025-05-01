@@ -82,8 +82,7 @@ export async function POST(request: Request) {
                 shipping_address: orderData.customerInfo.streetAddress,
                 city: orderData.customerInfo.city,
                 paid_amount: totalAmount,
-                payment_status: orderData.paymentDetails.transactionStatus ||
-                    "Pending",
+                payment_status: "unpaid", // Always set to "unpaid" initially
                 payment_id: orderData.paymentDetails.paymentID,
                 transaction_id: orderData.paymentDetails.transactionId,
                 payment_method: "bkash",
@@ -235,8 +234,7 @@ export async function GET(request: Request) {
             console.error("Error fetching order items:", itemsError);
             return NextResponse.json(
                 {
-                    error:
-                        `Failed to fetch order items: ${itemsError.message}`,
+                    error: `Failed to fetch order items: ${itemsError.message}`,
                 },
                 { status: 500 },
             );
@@ -255,8 +253,7 @@ export async function GET(request: Request) {
         const typedError = error as ErrorWithResponse;
         // Return appropriate error message and status
         const statusCode = typedError.response?.status || 500;
-        const errorMessage =
-            typedError.response?.data?.error ||
+        const errorMessage = typedError.response?.data?.error ||
             typedError.message ||
             "Failed to fetch order";
 
