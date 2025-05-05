@@ -5,7 +5,8 @@ export interface CartItem {
   quantity: number;
   description: string;
   image: string[];
-  discount?: number;
+  discount?: number; // Now a float
+  discount_type?: string; // New field: "percentage" or "fixed"
   discountPrice?: number;
   price: number;
   size: string;

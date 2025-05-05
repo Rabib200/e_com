@@ -28,7 +28,8 @@ interface Product {
   title: string;
   description: string;
   image: string[];
-  discount?: number;
+  discount?: number; // Now a float
+  discount_type?: string; // New field: "percentage" or "fixed" or other types
   discountPrice?: number;
   price: number;
   sizes: string[];
@@ -288,7 +289,11 @@ export default function ProductDetails() {
                 )}
                 {product.discount && product.discount > 0 && (
                   <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
-                    {product.discount}% OFF
+                    {product.discount_type === 'percentage' 
+                      ? `${product.discount.toFixed(0)}% OFF` 
+                      : product.discount_type === 'fixed'
+                        ? `৳${product.discount} OFF`
+                        : `${product.discount.toFixed(0)}% OFF` /* Default to percentage if not specified */}
                   </div>
                 )}
               </div>

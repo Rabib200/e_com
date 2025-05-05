@@ -22,7 +22,8 @@ interface Product {
   title: string;
   description: string;
   image?: string[] | null;
-  discount?: number;
+  discount?: number; // Now a float
+  discount_type?: string; // New field: could be "percentage" or "fixed" or other types
   discountPrice?: number;
   price: number;
   category: string;
