@@ -209,15 +209,15 @@ export default function ProductDetails() {
               <CarouselContent>
                 {product.image.map((img: string, index: number) => (
                   <CarouselItem key={index}>
-                    <div className="aspect-square sm:aspect-[4/3] md:aspect-[16/9] relative rounded-lg overflow-hidden">
+                    <div className="aspect-square relative rounded-lg overflow-hidden">
                       <Image
                         src={img}
                         alt={`${product.title} - Image ${index + 1}`}
-                        fill
+                        width={1080}
+                        height={1080}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        style={{ objectFit: "cover" }}
+                        className={`w-full h-full object-contain ${isOutOfStock ? "opacity-80 grayscale-[30%]" : ""}`}
                         priority={index === 0}
-                        className={isOutOfStock ? "opacity-80 grayscale-[30%]" : ""}
                       />
                       
                       {/* Overlay "Out of Stock" label on the image */}
@@ -268,8 +268,9 @@ export default function ProductDetails() {
                     <Image
                       src={img}
                       alt={`Thumbnail ${index + 1}`}
-                      fill
-                      style={{ objectFit: "cover" }}
+                      width={160}
+                      height={160}
+                      className="w-full h-full object-contain"
                     />
                   </div>
                 ))}
@@ -282,18 +283,11 @@ export default function ProductDetails() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl sm:text-2xl">{product.title}</CardTitle>
               <div className="flex items-center gap-2">
-                {isOutOfStock && (
-                  <div className="px-2 py-1 bg-red-600 text-white text-xs sm:text-sm font-bold rounded">
-                    Out of Stock
-                  </div>
-                )}
                 {product.discount && product.discount > 0 && (
                   <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
-                    {product.discount_type === 'percentage' 
-                      ? `${product.discount.toFixed(0)}% OFF` 
-                      : product.discount_type === 'fixed'
-                        ? `৳${product.discount} OFF`
-                        : `${product.discount.toFixed(0)}% OFF` /* Default to percentage if not specified */}
+                    {product.discount_type === 'flat' 
+                      ? `৳${product.discount} OFF` 
+                      : `${product.discount.toFixed(0)}% OFF`}
                   </div>
                 )}
               </div>

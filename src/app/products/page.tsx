@@ -28,6 +28,7 @@ interface Product {
   price: number;
   category: string;
   sizes: string[];
+  status?: string; // Add status field to handle out of stock
 }
 
 const SkeletonCard = () => (
@@ -94,13 +95,34 @@ const ProductsContent = () => {
                 <CardContent>
                   <div className="w-full h-64 relative">
                     {product.image?.[0] && (
-                      <Image
-                        src={product.image[0]}
-                        alt={product.title}
-                        fill
-                        style={{ objectFit: "cover" }}
-                        priority
-                      />
+                      <>
+                        <Image
+                          src={product.image[0]}
+                          alt={product.title}
+                          width={1080}
+                          height={1080}
+                          className={`w-full h-full object-contain ${product.status === "Out_of_Stock" ? "opacity-80 grayscale-[30%]" : ""}`}
+                          priority
+                        />
+                        
+                        {/* Out of Stock Overlay */}
+                        {product.status === "Out_of_Stock" && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-black bg-opacity-70 text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
+                              Out of Stock
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Discount Label */}
+                        {product.status !== "Out_of_Stock" && product.discount && product.discount > 0 && (
+                          <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-bl-md">
+                            {product.discount_type === 'flat' 
+                              ? `৳${product.discount} OFF` 
+                              : `${product.discount.toFixed(0)}% OFF`}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   <CardTitle>{product.title}</CardTitle>

@@ -185,12 +185,12 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-white text-black p-4 md:p-6 z-50 shadow-md">
+    <header className="fixed top-0 left-0 w-full bg-black text-white p-4 md:p-6 z-50 shadow-md">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <div className="flex-shrink-0">
           <h1 className="text-2xl font-bold">
-            <Link href={"/"}>Headgear BD</Link>
+            <Link href={"/"} className="text-white">Headgear BD</Link>
           </h1>
         </div>
 
@@ -199,7 +199,7 @@ const Header = () => {
           {/* Cart Icon for Mobile */}
           <div className="relative">
             <FaShoppingCart
-              className="text-black text-2xl cursor-pointer"
+              className="text-white text-2xl cursor-pointer"
               onClick={toggleCart}
             />
             {cartItems > 0 && (
@@ -212,7 +212,7 @@ const Header = () => {
           {/* Hamburger Menu */}
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
+              <Button variant="outline" size="icon" className="md:hidden bg-black border-white text-white hover:bg-gray-800">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -225,19 +225,19 @@ const Header = () => {
                   Browse our navigation menu
                 </DrawerDescription>
               </DrawerHeader>
-              <div className="px-4 py-2 overflow-y-auto">
+              <div className="px-4 py-2 overflow-y-auto bg-black">
                 <nav className="space-y-4">
                   <Link
                     href="/"
                     onClick={closeDrawer}
-                    className="block py-3 px-4 text-lg font-medium text-black hover:bg-gray-100 rounded-md border border-gray-200"
+                    className="block py-3 px-4 text-lg font-medium text-white hover:bg-gray-800 rounded-md border border-gray-700"
                   >
                     Home
                   </Link>
 
                   <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="jersey">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="jersey" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         JERSEY
                       </AccordionTrigger>
                       <AccordionContent>
@@ -246,7 +246,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -255,8 +255,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="tshirts">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="tshirts" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         T-SHIRTS
                       </AccordionTrigger>
                       <AccordionContent>
@@ -265,7 +265,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -274,8 +274,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="trousers">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="trousers" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         TROUSERS
                       </AccordionTrigger>
                       <AccordionContent>
@@ -284,7 +284,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -293,8 +293,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="pants">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="pants" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         PANTS
                       </AccordionTrigger>
                       <AccordionContent>
@@ -303,7 +303,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -312,8 +312,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="winter">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="winter" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         WINTER
                       </AccordionTrigger>
                       <AccordionContent>
@@ -322,7 +322,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -331,8 +331,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="sneakers">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="sneakers" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         SNEAKERS
                       </AccordionTrigger>
                       <AccordionContent>
@@ -341,7 +341,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -350,8 +350,8 @@ const Header = () => {
                       </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="contact">
-                      <AccordionTrigger className="py-2 px-3">
+                    <AccordionItem value="contact" className="border-gray-700">
+                      <AccordionTrigger className="py-2 px-3 text-white">
                         Contact
                       </AccordionTrigger>
                       <AccordionContent>
@@ -360,7 +360,7 @@ const Header = () => {
                             <a
                               key={component.title}
                               href={component.href}
-                              className="block py-2 px-3 text-sm hover:bg-gray-100 rounded-md"
+                              className="block py-2 px-3 text-sm text-white hover:bg-gray-800 rounded-md"
                             >
                               {component.title}
                             </a>
@@ -376,7 +376,7 @@ const Header = () => {
 
           {/* Mobile cart dropdown */}
           {isCartOpen && (
-            <div className="absolute top-16 right-4 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
+            <div className="absolute top-16 right-4 w-48 bg-black text-white shadow-lg rounded-lg p-4 z-50">
               <p className="text-sm">
                 You have {cartItems} items in your cart.
               </p>
@@ -397,18 +397,18 @@ const Header = () => {
               <NavigationMenuItem>
                 <NavigationMenuLink
                   href="/"
-                  className="block py-2 px-3 text-black font-bold hover:bg-gray-100 rounded-md"
+                  className="block py-2 px-3 text-white font-bold hover:bg-gray-800 rounded-md bg-black"
                 >
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   JERSEY
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(0, 3).map((component) => (
                         <ListItem
@@ -425,11 +425,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   T-SHIRTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(3, 6).map((component) => (
                         <ListItem
@@ -446,11 +446,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   TROUSERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(6, 9).map((component) => (
                         <ListItem
@@ -467,11 +467,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   PANTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(9, 12).map((component) => (
                         <ListItem
@@ -488,11 +488,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   WINTER
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(12, 15).map((component) => (
                         <ListItem
@@ -509,11 +509,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   SNEAKERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(15, 18).map((component) => (
                         <ListItem
@@ -530,11 +530,11 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-black">
+                <NavigationMenuTrigger className="text-white bg-black">
                   Contact
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
-                  <div className="w-[400px] lg:w-[500px] p-4">
+                  <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
                       {components.slice(18).map((component) => (
                         <ListItem
@@ -557,7 +557,7 @@ const Header = () => {
         <div className="hidden md:block">
           <div className="relative">
             <FaShoppingCart
-              className="text-black text-2xl cursor-pointer"
+              className="text-white text-2xl cursor-pointer"
               onClick={toggleCart}
             />
             {cartItems > 0 && (
@@ -566,7 +566,7 @@ const Header = () => {
               </span>
             )}
             {isCartOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-4 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-black text-white shadow-lg rounded-lg p-4 z-50">
                 <p className="text-sm">
                   You have {cartItems} items in your cart.
                 </p>
@@ -595,13 +595,13 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors text-white hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white",
             className
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          <div className="text-sm font-medium leading-none text-white">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-gray-300">
             {children}
           </p>
         </a>
@@ -613,7 +613,7 @@ ListItem.displayName = "ListItem";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-300 text-black p-4 text-center">
+    <footer className="bg-black text-white p-4 text-center">
       <div className="mb-4">
         <p>Contact us: +123 456 7890</p>
         <p>Address: 123 Headgear St, Dhaka, Bangladesh</p>
@@ -623,16 +623,23 @@ const Footer = () => {
           href="https://facebook.com"
           target="_blank"
           rel="noopener noreferrer"
+          className="text-white hover:text-gray-300"
         >
           <FaFacebook className="text-2xl" />
         </a>
-        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+        <a 
+          href="https://twitter.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-white hover:text-gray-300"
+        >
           <FaTwitter className="text-2xl" />
         </a>
         <a
           href="https://instagram.com"
           target="_blank"
           rel="noopener noreferrer"
+          className="text-white hover:text-gray-300"
         >
           <FaInstagram className="text-2xl" />
         </a>
@@ -657,6 +664,8 @@ interface Product {
   inStock?: boolean;
   price?: number;
   discountPrice?: number;
+  discount?: number;
+  discount_type?: string;
 }
 
 const Home = () => {
@@ -887,9 +896,9 @@ const Home = () => {
                     <Image
                       src={product.image[0] || "/placeholder.webp"}
                       alt={product.title || "Product"}
-                      width={400}
-                      height={400}
-                      className={`w-full h-full object-cover ${
+                      width={1080}
+                      height={1080}
+                      className={`w-full h-full object-contain ${
                         outOfStock ? "opacity-80 grayscale-[30%]" : ""
                       }`}
                       priority
@@ -903,17 +912,21 @@ const Home = () => {
                         </div>
                       </div>
                     )}
+                    
+                    {/* Discount Label */}
+                    {!outOfStock && product.discount && product.discount > 0 && (
+                      <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-bl-md">
+                        {product.discount_type === 'flat' 
+                          ? `৳${product.discount} OFF` 
+                          : `${product.discount.toFixed(0)}% OFF`}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-2">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm sm:text-base font-semibold line-clamp-1">
                         {product.title || "Product"}
                       </h3>
-                      {outOfStock && (
-                        <span className="px-1.5 py-0.5 bg-red-600 text-white text-[10px] sm:text-xs font-medium rounded">
-                          Out of Stock
-                        </span>
-                      )}
                     </div>
 
                     {/* Price Display */}
