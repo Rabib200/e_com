@@ -1079,7 +1079,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrendingProducts = async () => {
       try {
-        const response = await axiosInstance.get("/products?isTrending=eq.true&isAvailable=eq.true");
+        const response = await axiosInstance.get("/products?isTrending=eq.true&isAvailable=eq.true&order=updated_at.asc");
         setTrending(response.data);
       } catch (error) {
         console.error("Error fetching trending products:", error);
@@ -1100,7 +1100,7 @@ const Home = () => {
   return (
     <div>
       <Header />
-      <main className="p-4 sm:p-8 mt-24">
+      <main className="p-4 sm:p-8 mt-32 sm:mt-36">
         <section className="bg-gradient-to-br from-gray-50 to-gray-200 p-4 sm:p-6 rounded-lg shadow-md">
           <div className="mb-6 sm:mb-8">
             <Carousel autoPlay autoPlayInterval={5000} className="w-full">
@@ -1189,7 +1189,7 @@ const Home = () => {
 
         <h6 className="flex justify-center mt-10 sm:mt-16">
           <b className="text-3xl sm:text-5xl font-stretch-50% fill-amber-800">
-            TRENDING !!!
+            TOP SELLING !!!
           </b>
         </h6>
         <div className="flex justify-center mt-8">

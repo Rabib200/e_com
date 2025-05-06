@@ -152,7 +152,7 @@ const CartPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 mt-24">
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 mt-32 sm:mt-36">
       <h1 className="text-2xl font-bold mb-4">Shopping Cart</h1>
       <div className="bg-white p-4 shadow-md rounded-lg">
         <Table>

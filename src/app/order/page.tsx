@@ -139,7 +139,7 @@ const OrderContent = () => {
   const isOrderCancelled = order.status === 'cancelled';
   
   return (
-    <div className="container mx-auto px-4 py-12 max-w-3xl pt-28 sm:pt-32 pb-16">
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 mt-32 sm:mt-36">
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
         {/* Order confirmation header */}
         <div className="text-center mb-6 sm:mb-8">

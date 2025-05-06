@@ -233,7 +233,7 @@ const BillingPage = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 mt-16 sm:mt-24">
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 mt-32 sm:mt-36">
       {!isCartEmpty && (
         <div className="md:hidden mb-6">
           <div className="flex justify-between items-center mb-4">

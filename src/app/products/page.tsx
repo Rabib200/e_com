@@ -46,6 +46,7 @@ const SkeletonCard = () => (
 const ProductsContent = () => {
   const searchParams = useSearchParams();
   const category = searchParams.get("category") || "";
+  const search = searchParams.get("search") || "";
   const [currentPage, setCurrentPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,6 +62,12 @@ const ProductsContent = () => {
         if (category) {
           query += `&category=eq.${category}`;
         }
+
+        // Fix search query format
+        if(search) {
+          // Properly encode the search parameter for Supabase
+          query += `&or=(title.ilike.*${encodeURIComponent(search)}*)`;
+        }
         
         const response = await axiosInstance.get(`${query}&select=*`);
         setProducts(response.data);
@@ -71,7 +78,7 @@ const ProductsContent = () => {
       }
     };
     fetchProducts();
-  }, [category]);
+  }, [category, search]); // Also add search as a dependency
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -83,14 +90,22 @@ const ProductsContent = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <main className="p-8 mt-24">
-      <h1 className="text-3xl font-bold mb-8">All Products</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {loading
-          ? Array.from({ length: productsPerPage }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))
-          : currentProducts.map((product) => (
+    <div className="max-w-7xl mx-auto p-4 mt-32 sm:mt-36">
+      <h1 className="text-3xl font-bold mb-8">
+        {search ? `Search Results for "${search}"` : 'All Products'}
+        {category ? ` - ${category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}` : ''}
+      </h1>
+      
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {Array.from({ length: productsPerPage }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : products.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {currentProducts.map((product) => (
               <Card key={product.id} className="p-4">
                 <CardContent>
                   <div className="w-full h-64 relative">
@@ -125,45 +140,103 @@ const ProductsContent = () => {
                       </>
                     )}
                   </div>
-                  <CardTitle>{product.title}</CardTitle>
-                  <p className="text-gray-600">{product.description}</p>
+                  <CardTitle className="mt-3">{product.title}</CardTitle>
+                  <p className="text-gray-600 mt-2 line-clamp-2">{product.description}</p>
+                  <div className="mt-3 flex items-center">
+                    {product.discountPrice ? (
+                      <>
+                        <span className="text-red-500 font-medium mr-2">৳{product.discountPrice}</span>
+                        <span className="line-through text-gray-400 text-sm">৳{product.price}</span>
+                      </>
+                    ) : (
+                      <span className="font-medium">৳{product.price}</span>
+                    )}
+                  </div>
                   <Button
-                    className="mt-4"
+                    className="mt-4 bg-amber-600 hover:bg-amber-700"
                     onClick={() => router.push(`/products/${product.slug}`)}
                   >
-                    View More
+                    View Details
                   </Button>
                 </CardContent>
               </Card>
             ))}
-      </div>
-      <Pagination className="mt-8">
-        <PaginationContent>
-          <PaginationPrevious
-            onClick={() => currentPage > 1 && paginate(currentPage - 1)}
-          />
-          {Array.from(
-            { length: Math.ceil(products.length / productsPerPage) },
-            (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  isActive={currentPage === i + 1}
-                  onClick={() => paginate(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          )}
-          <PaginationNext
-            onClick={() =>
-              currentPage < Math.ceil(products.length / productsPerPage) &&
-              paginate(currentPage + 1)
-            }
-          />
-        </PaginationContent>
-      </Pagination>
-    </main>
+          </div>
+          
+          <Pagination className="mt-8">
+            <PaginationContent>
+              <PaginationPrevious
+                onClick={() => currentPage > 1 && paginate(currentPage - 1)}
+                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+              />
+              {Array.from(
+                { length: Math.ceil(products.length / productsPerPage) },
+                (_, i) => (
+                  <PaginationItem key={i}>
+                    <PaginationLink
+                      isActive={currentPage === i + 1}
+                      onClick={() => paginate(i + 1)}
+                    >
+                      {i + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationNext
+                onClick={() =>
+                  currentPage < Math.ceil(products.length / productsPerPage) &&
+                  paginate(currentPage + 1)
+                }
+                className={currentPage >= Math.ceil(products.length / productsPerPage) ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationContent>
+          </Pagination>
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="bg-gray-100 p-8 rounded-lg shadow-md text-center w-full max-w-lg">
+            <svg 
+              className="w-16 h-16 mx-auto text-gray-400 mb-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <h2 className="text-xl font-bold text-gray-700 mb-2">No Products Found</h2>
+            {search && (
+              <p className="text-gray-600 mb-4">
+                No products match your search for &quot;<span className="font-semibold">{search}</span>&quot;
+              </p>
+            )}
+            {category && (
+              <p className="text-gray-600 mb-4">
+                No products available in the category &quot;<span className="font-semibold">
+                  {category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </span>&quot;
+              </p>
+            )}
+            {!search && !category && (
+              <p className="text-gray-600 mb-4">
+                There are no products available at the moment.
+              </p>
+            )}
+            <Button 
+              onClick={() => router.push('/')}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
