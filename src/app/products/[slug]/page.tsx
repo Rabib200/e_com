@@ -200,7 +200,7 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 mt-32 sm:mt-36">
+    <div className="flex justify-center items-center w-full px-4 sm:px-6 mt-32 sm:mt-36">
       <Card className={`max-w-4xl w-full p-3 sm:p-6 shadow-md ${isOutOfStock ? 'opacity-90' : ''}`}>
         <CardContent className="space-y-6">
           {/* Product Image Carousel */}
