@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { axiosInstance } from "@/lib/supabase";
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -148,14 +148,19 @@ const Header = () => {
   const [cartItems, setCartItems] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const searchRef = React.useRef<HTMLDivElement>(null);
 
-  // Cart loading logic
   useEffect(() => {
     try {
       const getCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
       if (getCart && Array.isArray(getCart)) {
-        // If each item has a quantity property, sum up all quantities
         if (getCart.length > 0 && "quantity" in getCart[0]) {
           const totalItems = getCart.reduce(
             (total, item) => total + (item.quantity || 1),
@@ -163,7 +168,6 @@ const Header = () => {
           );
           setCartItems(totalItems);
         } else {
-          // Otherwise, just count the number of items in the cart
           setCartItems(getCart.length);
         }
       } else {
@@ -175,44 +179,83 @@ const Header = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const response = await axiosInstance.get(`/products?title=ilike.*${searchQuery}*&isAvailable=eq.true&select=id,title,slug,image,price,discountPrice,status`);
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchSearchResults();
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setShowResults(true);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setShowResults(false);
+      setSearchQuery('');
+    }
+  };
+
+
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
 
-  // Add a function to close the drawer
   const closeDrawer = () => {
     setDrawerOpen(false);
+  };
+
+  const toggleMobileSearch = () => {
+    setMobileSearchOpen(!mobileSearchOpen);
   };
 
   return (
     <header className="fixed top-0 left-0 w-full bg-black text-white p-4 md:p-6 z-50 shadow-md">
       <div className="flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <h1 className="text-2xl font-bold">
-            <Link href={"/"} className="text-white">Headgear BD</Link>
-          </h1>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="flex items-center gap-4 md:hidden">
-          {/* Cart Icon for Mobile */}
-          <div className="relative">
-            <FaShoppingCart
-              className="text-white text-2xl cursor-pointer"
-              onClick={toggleCart}
-            />
-            {cartItems > 0 && (
-              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-                {cartItems}
-              </span>
-            )}
-          </div>
-
-          {/* Hamburger Menu */}
+        {/* Left section - hamburger menu only */}
+        <div className="md:hidden">
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden bg-black border-white text-white hover:bg-gray-800">
+              <Button variant="outline" size="icon" className="bg-black border-white text-white hover:bg-gray-800">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -220,12 +263,113 @@ const Header = () => {
             <DrawerContent className="h-[85vh]">
               <DrawerHeader className="border-b">
                 <DrawerTitle>Menu</DrawerTitle>
-                {/* Add this DrawerDescription to fix the accessibility warning */}
                 <DrawerDescription>
                   Browse our navigation menu
                 </DrawerDescription>
               </DrawerHeader>
               <div className="px-4 py-2 overflow-y-auto bg-black">
+                {/* Search bar in drawer */}
+                <div className="mb-4 relative" ref={searchRef}>
+                  <form onSubmit={(e) => {
+                    handleSearchSubmit(e);
+                    closeDrawer();
+                  }}>
+                    <div className="relative flex items-center w-full">
+                      <input
+                        type="search"
+                        name="search"
+                        placeholder="Search for products..."
+                        className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
+                        value={searchQuery}
+                        onChange={handleSearchInputChange}
+                      />
+                      <button
+                        type="submit"
+                        className="absolute right-3 text-gray-400 hover:text-white"
+                        aria-label="Search"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </form>
+                  {showResults && (
+                    <div className="absolute left-0 right-0 mt-2 w-full bg-black text-white shadow-lg rounded-lg p-4 z-[9999] max-h-60 overflow-y-auto">
+                      {isSearching ? (
+                        <div className="flex justify-center py-4">
+                          <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-amber-600"></div>
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <>
+                          {searchResults.map((result) => (
+                            <a 
+                              key={result.id} 
+                              href={`/products/${result.slug}`} 
+                              className="block mb-2 no-underline"
+                              onClick={() => {
+                                closeDrawer();
+                              }}
+                            >
+                              <div className="py-2 px-2 hover:bg-gray-800 active:bg-gray-700 cursor-pointer rounded-md flex items-center gap-3">
+                                <div className="w-12 h-12 relative flex-shrink-0 border border-gray-700 rounded-sm overflow-hidden">
+                                  {result.image && result.image[0] ? (
+                                    <Image
+                                      src={result.image[0]}
+                                      alt={result.title}
+                                      fill
+                                      sizes="48px"
+                                      className="object-contain"
+                                    />
+                                  ) : (
+                                    <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500 text-xs">
+                                      No image
+                                    </div>
+                                  )}
+                                  {result.status === "Out_of_Stock" && (
+                                    <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                                      <span className="text-white text-xs font-medium">Out of stock</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-grow">
+                                  <p className="text-sm font-medium line-clamp-1 text-white">{result.title}</p>
+                                  <div className="flex gap-2 items-center">
+                                    {result.discountPrice ? (
+                                      <>
+                                        <span className="text-xs text-red-400">৳{result.discountPrice}</span>
+                                        <span className="text-xs text-gray-400 line-through">৳{result.price}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-xs text-gray-300">
+                                        {result.price ? `৳${result.price}` : "Price not available"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </a>
+                          ))}
+                          <div className="mt-2 pt-2 border-t border-gray-700 text-center">
+                            <a 
+                              href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                              className="block py-2 text-sm text-amber-500 hover:text-amber-400"
+                              onClick={closeDrawer}
+                            >
+                              See all results for &quot;{searchQuery}&quot;
+                            </a>
+                          </div>
+                        </>
+                      ) : searchQuery.trim().length > 0 ? (
+                        <div className="py-4 text-center">
+                          <p className="text-sm">No results found for &quot;{searchQuery}&quot;</p>
+                          <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+                
                 <nav className="space-y-4">
                   <Link
                     href="/"
@@ -337,7 +481,7 @@ const Header = () => {
                       </AccordionTrigger>
                       <AccordionContent>
                         <div className="pl-4 space-y-2">
-                          {components.slice(15, 17).map((component) => (
+                          {components.slice(15, 16).map((component) => (
                             <a
                               key={component.title}
                               href={component.href}
@@ -373,24 +517,43 @@ const Header = () => {
               </div>
             </DrawerContent>
           </Drawer>
-
-          {/* Mobile cart dropdown */}
-          {isCartOpen && (
-            <div className="absolute top-16 right-4 w-48 bg-black text-white shadow-lg rounded-lg p-4 z-50">
-              <p className="text-sm">
-                You have {cartItems} items in your cart.
-              </p>
-              <a
-                className="mt-2 w-full inline-block text-center bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700"
-                href="/cart"
-              >
-                View Cart
-              </a>
-            </div>
-          )}
         </div>
 
-        {/* Desktop Navigation - Hidden on Mobile */}
+        {/* Center section - logo/title */}
+        <div className="flex-1 flex justify-center">
+          <h1 className="text-2xl font-bold">
+            <Link href={"/"} className="text-white">Headgear BD</Link>
+          </h1>
+        </div>
+
+        {/* Right section - search icon and cart for mobile */}
+        <div className="flex md:hidden items-center gap-3">
+          {/* Search icon for mobile - now to the left of cart */}
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="bg-black border-white text-white hover:bg-gray-800"
+            onClick={toggleMobileSearch}
+          >
+            <Search className="h-5 w-5" />
+            <span className="sr-only">Search</span>
+          </Button>
+          
+          {/* Mobile cart */}
+          <div className="relative">
+            <FaShoppingCart
+              className="text-white text-2xl cursor-pointer"
+              onClick={toggleCart}
+            />
+            {cartItems > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+                {cartItems}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop navigation menu - unchanged */}
         <div className="hidden md:flex flex-grow justify-center">
           <NavigationMenu viewport={false} className="relative">
             <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
@@ -512,10 +675,10 @@ const Header = () => {
                 <NavigationMenuTrigger className="text-white bg-black">
                   SNEAKERS
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="right-0 left-auto">
+                <NavigationMenuContent>
                   <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
-                    <ul className="grid gap-3 lg:grid-cols-2">
-                      {components.slice(15, 18).map((component) => (
+                    <ul className="grid gap-3">
+                      {components.slice(15, 17).map((component) => (
                         <ListItem
                           key={component.title}
                           title={component.title}
@@ -536,7 +699,7 @@ const Header = () => {
                 <NavigationMenuContent className="right-0 left-auto">
                   <div className="w-[400px] lg:w-[500px] p-4 bg-black text-white">
                     <ul className="grid gap-3 lg:grid-cols-2">
-                      {components.slice(18).map((component) => (
+                      {components.slice(17).map((component) => (
                         <ListItem
                           key={component.title}
                           title={component.title}
@@ -553,7 +716,7 @@ const Header = () => {
           </NavigationMenu>
         </div>
 
-        {/* Desktop Cart - Hidden on Mobile */}
+        {/* Desktop cart - unchanged */}
         <div className="hidden md:block">
           <div className="relative">
             <FaShoppingCart
@@ -580,6 +743,234 @@ const Header = () => {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Cart dropdown for mobile - shown when cart is clicked */}
+      {isCartOpen && (
+        <div className="absolute top-16 right-4 w-48 bg-black text-white shadow-lg rounded-lg p-4 z-50 md:hidden">
+          <p className="text-sm">
+            You have {cartItems} items in your cart.
+          </p>
+          <a
+            className="mt-2 w-full inline-block text-center bg-amber-600 text-white py-2 px-4 rounded hover:bg-amber-700"
+            href="/cart"
+          >
+            View Cart
+          </a>
+        </div>
+      )}
+
+      {/* Mobile search box that appears when the search icon is clicked */}
+      {mobileSearchOpen && (
+        <div className="md:hidden mt-4 relative w-full" ref={searchRef}>
+          <form onSubmit={handleSearchSubmit}>
+            <div className="relative flex items-center w-full">
+              <input
+                type="search"
+                name="search"
+                placeholder="Search for products..."
+                className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                autoFocus
+              />
+              <button
+                type="button"
+                className="absolute right-10 text-gray-400 hover:text-white"
+                onClick={() => setMobileSearchOpen(false)}
+                aria-label="Close search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <button
+                type="submit"
+                className="absolute right-3 text-gray-400 hover:text-white"
+                aria-label="Search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </form>
+          {showResults && (
+            <div className="absolute left-0 right-0 mt-2 w-full bg-black text-white shadow-lg rounded-lg p-4 z-[9999] max-h-60 overflow-y-auto">
+              {isSearching ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-amber-600"></div>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <>
+                  {searchResults.map((result) => (
+                    <a 
+                      key={result.id} 
+                      href={`/products/${result.slug}`} 
+                      className="block mb-2 no-underline"
+                      onClick={() => {
+                        setMobileSearchOpen(false);
+                      }}
+                    >
+                      <div className="py-2 px-2 hover:bg-gray-800 active:bg-gray-700 cursor-pointer rounded-md flex items-center gap-3">
+                        <div className="w-12 h-12 relative flex-shrink-0 border border-gray-700 rounded-sm overflow-hidden">
+                          {result.image && result.image[0] ? (
+                            <Image
+                              src={result.image[0]}
+                              alt={result.title}
+                              fill
+                              sizes="48px"
+                              className="object-contain"
+                            />
+                          ) : (
+                            <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500 text-xs">
+                              No image
+                            </div>
+                          )}
+                          {result.status === "Out_of_Stock" && (
+                            <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                              <span className="text-white text-xs font-medium">Out of stock</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <p className="text-sm font-medium line-clamp-1 text-white">{result.title}</p>
+                          <div className="flex gap-2 items-center">
+                            {result.discountPrice ? (
+                              <>
+                                <span className="text-xs text-red-400">৳{result.discountPrice}</span>
+                                <span className="text-xs text-gray-400 line-through">৳{result.price}</span>
+                              </>
+                            ) : (
+                              <span className="text-xs text-gray-300">
+                                {result.price ? `৳${result.price}` : "Price not available"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                  <div className="mt-2 pt-2 border-t border-gray-700 text-center">
+                    <a 
+                      href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                      className="block py-2 text-sm text-amber-500 hover:text-amber-400"
+                      onClick={() => setMobileSearchOpen(false)}
+                    >
+                      See all results for &quot;{searchQuery}&quot;
+                    </a>
+                  </div>
+                </>
+              ) : searchQuery.trim().length > 0 ? (
+                <div className="py-4 text-center">
+                  <p className="text-sm">No results found for &quot;{searchQuery}&quot;</p>
+                  <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="hidden md:block mt-4 max-w-2xl mx-auto relative w-full" ref={searchRef}>
+        <form onSubmit={handleSearchSubmit}>
+          <div className="relative flex items-center w-full">
+            <input
+              type="search"
+              name="search"
+              placeholder="Search for products..."
+              className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+            />
+            <button
+              type="submit"
+              className="absolute right-3 text-gray-400 hover:text-white"
+              aria-label="Search"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </form>
+        {showResults && (
+          <div className="absolute mt-2 w-full bg-black text-white shadow-lg rounded-lg p-4 z-[100] max-h-80 overflow-y-auto">
+            {isSearching ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-amber-600"></div>
+              </div>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((result) => (
+                <Link
+                key={result.id}
+                href={`/products/${result.slug}`}
+                className="block"
+                onClick={(e) => {
+                  console.log("ON desktop Click")
+                  e.stopPropagation();
+                  setShowResults(false);
+                  setSearchQuery('');
+                }}
+              >
+                  <div className="py-2 px-2 hover:bg-gray-800 cursor-pointer rounded-md flex items-center gap-3">
+                    <div className="w-12 h-12 relative flex-shrink-0 border border-gray-700 rounded-sm overflow-hidden">
+                      {result.image && result.image[0] ? (
+                        <Image
+                          src={result.image[0]}
+                          alt={result.title}
+                          fill
+                          sizes="48px"
+                          className="object-contain"
+                        />
+                      ) : (
+                        <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500 text-xs">
+                          No image
+                        </div>
+                      )}
+                      {result.status === "Out_of_Stock" && (
+                        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                          <span className="text-white text-xs font-medium">Out of stock</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <p className="text-sm font-medium line-clamp-1">{result.title}</p>
+                      <div className="flex gap-2 items-center">
+                        {result.discountPrice ? (
+                          <>
+                            <span className="text-xs text-red-400">৳{result.discountPrice}</span>
+                            <span className="text-xs text-gray-400 line-through">৳{result.price}</span>
+                          </>
+                        ) : (
+                          <span className="text-xs text-gray-300">
+                            {result.price ? `৳${result.price}` : "Price not available"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : searchQuery.trim().length > 0 ? (
+              <div className="py-4 text-center">
+                <p className="text-sm">No results found for {searchQuery}</p>
+                <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+              </div>
+            ) : null}
+            
+            {searchResults.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-gray-700 text-center">
+                <button 
+                  className="text-sm text-amber-500 hover:text-amber-400"
+                  onClick={handleSearchSubmit}
+                >
+                  See all results for {searchQuery}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
@@ -702,7 +1093,6 @@ const Home = () => {
     router.push(`/products/${slug}`);
   }
 
-  // Function to check if a product is out of stock - only use status field
   const isOutOfStock = (product: Product) => {
     return product.status === "Out_of_Stock";
   };
@@ -711,9 +1101,7 @@ const Home = () => {
     <div>
       <Header />
       <main className="p-4 sm:p-8 mt-24">
-        {/* Hero Section with Enhanced Carousel and Text */}
         <section className="bg-gradient-to-br from-gray-50 to-gray-200 p-4 sm:p-6 rounded-lg shadow-md">
-          {/* Larger Carousel for Mobile */}
           <div className="mb-6 sm:mb-8">
             <Carousel autoPlay autoPlayInterval={5000} className="w-full">
               <CarouselContent>
@@ -787,7 +1175,6 @@ const Home = () => {
             </Carousel>
           </div>
 
-          {/* Enhanced and Responsive Text */}
           <div className="text-center px-3 py-6 sm:py-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 mb-4">
               Explore the Best Headgear Collection
@@ -797,9 +1184,6 @@ const Home = () => {
               fashionable sportswear for every occasion. Authentic designs with
               unmatched comfort.
             </p>
-            <Button className="px-6 py-3 bg-amber-600 hover:bg-amber-700 transition-all duration-300 text-white text-base sm:text-lg rounded-md shadow-md hover:shadow-lg transform hover:-translate-y-1">
-              Shop Now
-            </Button>
           </div>
         </section>
 
@@ -832,7 +1216,6 @@ const Home = () => {
                   </CarouselItem>
                 ))
               ) : (
-                // Fallback images if no trending products are loaded
                 <>
                   <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                     <Image
@@ -904,7 +1287,6 @@ const Home = () => {
                       priority
                     />
 
-                    {/* Out of Stock Overlay */}
                     {outOfStock && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="bg-black bg-opacity-70 text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
@@ -913,7 +1295,6 @@ const Home = () => {
                       </div>
                     )}
                     
-                    {/* Discount Label */}
                     {!outOfStock && product.discount && product.discount > 0 && (
                       <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-bl-md">
                         {product.discount_type === 'flat' 
@@ -929,7 +1310,6 @@ const Home = () => {
                       </h3>
                     </div>
 
-                    {/* Price Display */}
                     {(product.price || product.discountPrice) && (
                       <div className="flex items-center space-x-1 text-sm mt-1">
                         {product.discountPrice ? (

@@ -146,8 +146,8 @@ const BillingPage = () => {
   };
 
   const handlePlaceOrder = async () => {
-    // Form validation
-    if (!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email) {
+    // Form validation - remove email from required fields
+    if (!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone) {
       alert("Please fill in all required fields");
       return;
     }
@@ -321,14 +321,13 @@ const BillingPage = () => {
               />
             </div>
             <div>
-              <Label htmlFor="email">Email Address *</Label>
+              <Label htmlFor="email">Email Address</Label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="Enter your email" 
+                placeholder="Enter your email (optional)" 
                 value={formData.email}
                 onChange={handleInputChange}
-                required
               />
             </div>
             <div>
@@ -464,13 +463,13 @@ const BillingPage = () => {
             <Button 
               className="w-full py-2.5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-base sm:text-lg" 
               onClick={handlePlaceOrder}
-              disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email || !transactionId.trim()}
+              disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !transactionId.trim()}
             >
               Place Order
             </Button>
           )}
           
-          {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || formData.email === '' || !transactionId.trim()) && (
+          {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || !transactionId.trim()) && (
             <p className="text-xs sm:text-sm text-red-500 text-center mt-2">
               Please fill in all required fields including bKash Transaction ID to place your order
             </p>
