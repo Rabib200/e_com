@@ -99,7 +99,7 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: "Denim Pants",
     href: "/products?category=denim-pants",
-    description: "Get the latest headgear accessories.",
+    description: "Get the latest fit&kit accessories.",
   },
   {
     title: "Cargo Pants",
@@ -124,7 +124,7 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: "Adidas",
     href: "/products?category=adidas",
-    description: "Get the latest headgear accessories.",
+    description: "Get the latest Fit&Kit accessories.",
   },
   {
     title: "Nike",
@@ -520,12 +520,20 @@ const Header = () => {
         </div>
 
         {/* Center section - logo/title */}
-        <div className="flex-1 flex justify-center">
-          <h1 className="text-2xl font-bold">
-            <Link href={"/"} className="text-white">Headgear BD</Link>
-          </h1>
+        <div className="flex-1 flex justify-center items-center">
+          <Link href={"/"} className="text-white">
+            <div className="relative w-[250px] md:w-[250px]">
+              <Image 
+                src="/mainLogoCropped.jpg" 
+                alt="fitandkit Logo" 
+                width={250}
+                height={100}
+                className="object-contain max-h-16"
+                priority
+              />
+            </div>
+          </Link>
         </div>
-
         {/* Right section - search icon and cart for mobile */}
         <div className="flex md:hidden items-center gap-3">
           {/* Search icon for mobile - now to the left of cart */}
@@ -553,21 +561,21 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Desktop navigation menu - unchanged */}
+        {/* Desktop navigation menu - updated */}
         <div className="hidden md:flex flex-grow justify-center">
           <NavigationMenu viewport={false} className="relative">
             <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
               <NavigationMenuItem>
                 <NavigationMenuLink
                   href="/"
-                  className="block py-2 px-3 text-white font-bold hover:bg-gray-800 rounded-md bg-black"
+                  className="block py-2 px-3 text-white font-bold hover:bg-gray-800 rounded-md bg-black flex items-center h-10"
                 >
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   JERSEY
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -588,7 +596,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   T-SHIRTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -609,7 +617,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   TROUSERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -630,7 +638,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   PANTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -651,7 +659,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   WINTER
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -672,7 +680,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   SNEAKERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -693,7 +701,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
                   Contact
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
@@ -1007,7 +1015,7 @@ const Footer = () => {
     <footer className="bg-black text-white p-4 text-center">
       <div className="mb-4">
         <p>Contact us: +123 456 7890</p>
-        <p>Address: 123 Headgear St, Dhaka, Bangladesh</p>
+        <p>Address: 123 Fit&Kit St, Dhaka, Bangladesh</p>
       </div>
       <div className="flex justify-center space-x-4 mb-4">
         <a
@@ -1039,7 +1047,7 @@ const Footer = () => {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
         odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.
       </p>
-      <p>&copy; {new Date().getFullYear()} Headgear BD Clone</p>
+      <p>&copy; {new Date().getFullYear()} Fit & Kit</p>
     </footer>
   );
 };
@@ -1177,7 +1185,7 @@ const Home = () => {
 
           <div className="text-center px-3 py-6 sm:py-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 mb-4">
-              Explore the Best Headgear Collection
+              Explore the Best Apparel Collection
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
               Discover premium quality jerseys, stylish t-shirts, and
