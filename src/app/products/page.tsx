@@ -31,8 +31,12 @@ interface Product {
   status?: string; // Add status field to handle out of stock
 }
 
-const SkeletonCard = () => (
-  <Card className="p-4">
+interface SkeletonCardProps {
+  className?: string;
+}
+
+const SkeletonCard = ({ className = "" }: SkeletonCardProps) => (
+  <Card className={`p-4 ${className}`}>
     <CardContent>
       <Skeleton className="w-full h-64 mb-4" />
       <Skeleton className="h-6 w-3/4 mb-2" />
@@ -106,72 +110,70 @@ const ProductsContent = () => {
         </div>
       ) : products.length > 0 ? (
         <>
-          <div className="flex flex-col items-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
-              {currentProducts.map((product) => (
-                <Card 
-                  key={product.id} 
-                  className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-200 w-full"
-                  onClick={() => router.push(`/products/${product.slug}`)}
-                >
-                  <CardContent className="p-4 flex flex-col h-full">
-                    <div className="w-full h-64 relative mb-3 flex-shrink-0">
-                      {product.image?.[0] && (
-                        <>
-                          <Image
-                            src={product.image[0]}
-                            alt={product.title}
-                            width={1080}
-                            height={1080}
-                            className={`w-full h-full object-contain ${product.status === "Out_of_Stock" ? "opacity-80 grayscale-[30%]" : ""}`}
-                            priority
-                          />
-                          
-                          {/* Out of Stock Overlay */}
-                          {product.status === "Out_of_Stock" && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="bg-black bg-opacity-70 text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
-                                Out of Stock
-                              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mx-auto justify-items-center">
+            {currentProducts.map((product) => (
+              <Card 
+                key={product.id} 
+                className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                onClick={() => router.push(`/products/${product.slug}`)}
+              >
+                <CardContent className="p-4 flex flex-col h-full">
+                  <div className="w-full h-64 relative mb-3 flex-shrink-0">
+                    {product.image?.[0] && (
+                      <>
+                        <Image
+                          src={product.image[0]}
+                          alt={product.title}
+                          width={1080}
+                          height={1080}
+                          className={`w-full h-full object-contain ${product.status === "Out_of_Stock" ? "opacity-80 grayscale-[30%]" : ""}`}
+                          priority
+                        />
+                        
+                        {/* Out of Stock Overlay */}
+                        {product.status === "Out_of_Stock" && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-black bg-opacity-70 text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
+                              Out of Stock
                             </div>
-                          )}
-                          
-                          {/* Discount Label */}
-                          {product.status !== "Out_of_Stock" && product.discount && product.discount > 0 && (
-                            <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-bl-md">
-                              {product.discount_type === 'flat' 
-                                ? `৳${product.discount} OFF` 
-                                : `${product.discount.toFixed(0)}% OFF`}
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                    <div className="flex-grow flex flex-col">
-                      <CardTitle className="mb-2 line-clamp-2 text-lg">{product.title}</CardTitle>
-                      <p className="text-gray-600 mb-3 line-clamp-2 text-sm flex-grow">{product.description}</p>
-                      <div className="mt-auto">
-                        <div className="flex items-center mb-3">
-                          {product.discountPrice ? (
-                            <>
-                              <span className="text-red-500 font-medium mr-2">৳{product.discountPrice}</span>
-                              <span className="line-through text-gray-400 text-sm">৳{product.price}</span>
-                            </>
-                          ) : (
-                            <span className="font-medium">৳{product.price}</span>
-                          )}
-                        </div>
-                        <Button
-                          className="w-full bg-amber-600 hover:bg-amber-700"
-                        >
-                          View Details
-                        </Button>
+                          </div>
+                        )}
+                        
+                        {/* Discount Label */}
+                        {product.status !== "Out_of_Stock" && product.discount && product.discount > 0 && (
+                          <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-bl-md">
+                            {product.discount_type === 'flat' 
+                              ? `৳${product.discount} OFF` 
+                              : `${product.discount.toFixed(0)}% OFF`}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  <div className="flex-grow flex flex-col">
+                    <CardTitle className="mb-2 line-clamp-2 text-lg">{product.title}</CardTitle>
+                    <p className="text-gray-600 mb-3 line-clamp-2 text-sm flex-grow">{product.description}</p>
+                    <div className="mt-auto">
+                      <div className="flex items-center mb-3">
+                        {product.discountPrice ? (
+                          <>
+                            <span className="text-red-500 font-medium mr-2">৳{product.discountPrice}</span>
+                            <span className="line-through text-gray-400 text-sm">৳{product.price}</span>
+                          </>
+                        ) : (
+                          <span className="font-medium">৳{product.price}</span>
+                        )}
                       </div>
+                      <Button
+                        className="w-full bg-amber-600 hover:bg-amber-700"
+                      >
+                        View Details
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
           
           <Pagination className="mt-8">
@@ -257,12 +259,12 @@ const Products = () => {
       fallback={
         <div className="flex flex-col items-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+            <SkeletonCard className="w-full" />
+            <SkeletonCard className="w-full" />
+            <SkeletonCard className="w-full" />
+            <SkeletonCard className="w-full" />
+            <SkeletonCard className="w-full" />
+            <SkeletonCard className="w-full" />
           </div>
         </div>
       }
