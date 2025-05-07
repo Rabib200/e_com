@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://fitandkit.com'),
+  metadataBase: new URL('https://fitandkit.shop'),
   title: {
     default: "Fit & Kit - Premium Apparel Collection",
     template: "%s | Fit & Kit"
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fit & Kit - Premium Apparel Collection",
     description: "Find the Best Premium Quality Jerseys, Stylish T-shirts, and Fashionable Sportswear at Fit & Kit",
-    url: "https://fitandkit.com",
+    url: "https://fitandkit.shop",
     siteName: "Fit & Kit",
     locale: "en_US",
     type: "website",
