@@ -1122,7 +1122,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axiosInstance.get("/products?isAvailable=eq.true");
+        const response = await axiosInstance.get("/products?isAvailable=eq.true&order=created_at.desc");
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -1134,7 +1134,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTrendingProducts = async () => {
       try {
-        const response = await axiosInstance.get("/products?isTrending=eq.true&isAvailable=eq.true&order=updated_at.asc");
+        const response = await axiosInstance.get("/products?isTrending=eq.true&isAvailable=eq.true&order=updated_at.desc");
         setTrending(response.data);
       } catch (error) {
         console.error("Error fetching trending products:", error);
