@@ -206,7 +206,7 @@ const CartPage = () => {
                       disabled={!inStock}
                     />
                   </TableCell>
-                  <TableCell>${item.discountPrice ? (item.discountPrice * (item.quantity || 1)).toFixed(2) : (item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
+                  <TableCell>৳{item.discountPrice ? (item.discountPrice * (item.quantity || 1)).toFixed(2) : (item.price * (item.quantity || 1)).toFixed(2)}</TableCell>
                   <TableCell>
                     <Button variant="destructive" onClick={() => removeFromCart(item.id)}>
                       {!inStock ? "Remove (Out of Stock)" : "Remove"}
@@ -232,10 +232,7 @@ const CartPage = () => {
                 <span>Subtotal:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between mb-1">
-                <span>Shipping:</span>
-                <span>FREE</span>
-              </div>
+
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
                 <span>${subtotal.toFixed(2)}</span>
