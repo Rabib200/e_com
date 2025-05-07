@@ -200,168 +200,173 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="flex justify-center items-center w-full px-4 sm:px-6 mt-32 sm:mt-36">
-      <Card className={`max-w-4xl w-full p-3 sm:p-6 shadow-md ${isOutOfStock ? 'opacity-90' : ''}`}>
-        <CardContent className="space-y-6">
-          {/* Product Image Carousel */}
-          <div className="w-full relative mb-4">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {product.image.map((img: string, index: number) => (
-                  <CarouselItem key={index}>
-                    <div className="aspect-square relative rounded-lg overflow-hidden">
-                      <Image
-                        src={img}
-                        alt={`${product.title} - Image ${index + 1}`}
-                        width={1080}
-                        height={1080}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className={`w-full h-full object-contain ${isOutOfStock ? "opacity-80 grayscale-[30%]" : ""}`}
-                        priority={index === 0}
-                      />
-                      
-                      {/* Overlay "Out of Stock" label on the image */}
-                      {isOutOfStock && index === 0 && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-black bg-opacity-70 text-white px-4 py-2 rounded-md text-lg font-bold transform rotate-[-15deg] shadow-lg">
-                            Out of Stock
-                          </div>
+    <div className="flex justify-center items-start w-full px-4 sm:px-6 mt-20 sm:mt-24 mb-16">
+      <Card className={`max-w-6xl w-full p-3 sm:p-4 shadow-md ${isOutOfStock ? 'opacity-90' : ''}`}>
+        <CardContent className="p-2 sm:p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {/* Left Column - Product Images */}
+            <div className="w-full">
+              {/* Product Image Carousel */}
+              <div className="w-full relative mb-4">
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {product.image.map((img: string, index: number) => (
+                      <CarouselItem key={index}>
+                        <div className="aspect-square relative rounded-lg overflow-hidden">
+                          <Image
+                            src={img}
+                            alt={`${product.title} - Image ${index + 1}`}
+                            width={600}
+                            height={600}
+                            sizes="(max-width: 768px) 100vw, 40vw"
+                            className={`w-full h-full object-contain ${isOutOfStock ? "opacity-80 grayscale-[30%]" : ""}`}
+                            priority={index === 0}
+                          />
+                          
+                          {/* Overlay "Out of Stock" label on the image */}
+                          {isOutOfStock && index === 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="bg-black bg-opacity-70 text-white px-3 py-1.5 rounded-md text-base font-bold transform rotate-[-15deg] shadow-lg">
+                                Out of Stock
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2 h-8 w-8" />
-              <CarouselNext className="right-2 h-8 w-8" />
-            </Carousel>
-            
-            {/* Thumbnail Navigation (visible on larger screens) */}
-            {product.image.length > 1 && (
-              <div className="hidden sm:flex mt-4 space-x-2 justify-center">
-                {product.image.map((img: string, index: number) => (
-                  <div 
-                    key={`thumb-${index}`}
-                    className={`cursor-pointer w-16 h-16 relative rounded-md overflow-hidden border-2 transition-all ${
-                      currentImageIndex === index 
-                        ? "border-amber-600 opacity-100" 
-                        : "border-transparent opacity-70 hover:opacity-100"
-                    } ${isOutOfStock ? "grayscale-[30%]" : ""}`}
-                    onClick={() => {
-                      setCurrentImageIndex(index);
-                      // Find and click the carousel navigation button
-                      const buttons = document.querySelectorAll('[data-carousel-button]');
-                      if (buttons && buttons.length >= 2) {
-                        // This is a workaround - in a real implementation, you would use a ref to control the carousel
-                        const diff = index - currentImageIndex;
-                        const clickCount = Math.abs(diff);
-                        const buttonIndex = diff > 0 ? 1 : 0; // 0 for prev, 1 for next
-                        
-                        for (let i = 0; i < clickCount; i++) {
-                          setTimeout(() => {
-                            (buttons[buttonIndex] as HTMLButtonElement).click();
-                          }, i * 100);
-                        }
-                      }
-                    }}
-                  >
-                    <Image
-                      src={img}
-                      alt={`Thumbnail ${index + 1}`}
-                      width={160}
-                      height={160}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          {/* Product Info */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl sm:text-2xl">{product.title}</CardTitle>
-              <div className="flex items-center gap-2">
-                {product.discount && product.discount > 0 && (
-                  <div className="px-2 py-1 bg-red-500 text-white text-xs sm:text-sm font-bold rounded">
-                    {product.discount_type === 'flat' 
-                      ? `৳${product.discount} OFF` 
-                      : `${product.discount.toFixed(0)}% OFF`}
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2 h-7 w-7" />
+                  <CarouselNext className="right-2 h-7 w-7" />
+                </Carousel>
+                
+                {/* Thumbnail Navigation (visible on larger screens) */}
+                {product.image.length > 1 && (
+                  <div className="hidden sm:flex mt-3 space-x-1.5 justify-center">
+                    {product.image.map((img: string, index: number) => (
+                      <div 
+                        key={`thumb-${index}`}
+                        className={`cursor-pointer w-12 h-12 relative rounded-md overflow-hidden border-2 transition-all ${
+                          currentImageIndex === index 
+                            ? "border-amber-600 opacity-100" 
+                            : "border-transparent opacity-70 hover:opacity-100"
+                        } ${isOutOfStock ? "grayscale-[30%]" : ""}`}
+                        onClick={() => {
+                          setCurrentImageIndex(index);
+                          // Find and click the carousel navigation button
+                          const buttons = document.querySelectorAll('[data-carousel-button]');
+                          if (buttons && buttons.length >= 2) {
+                            // This is a workaround - in a real implementation, you would use a ref to control the carousel
+                            const diff = index - currentImageIndex;
+                            const clickCount = Math.abs(diff);
+                            const buttonIndex = diff > 0 ? 1 : 0; // 0 for prev, 1 for next
+                            
+                            for (let i = 0; i < clickCount; i++) {
+                              setTimeout(() => {
+                                (buttons[buttonIndex] as HTMLButtonElement).click();
+                              }, i * 100);
+                            }
+                          }
+                        }}
+                      >
+                        <Image
+                          src={img}
+                          alt={`Thumbnail ${index + 1}`}
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
             </div>
             
-            <div className="flex items-center space-x-2 text-lg sm:text-xl font-semibold">
-              {product.discountPrice ? (
-                <>
-                  <span className="text-red-500">৳{product.discountPrice}</span>
-                  <span className="line-through text-gray-500">
-                    ৳{product.price}
-                  </span>
-                </>
-              ) : (
-                <span className="text-gray-700">৳{product.price}</span>
-              )}
-            </div>
-            
-            <CardDescription className="text-sm sm:text-base py-2">
-              {product.description}
-            </CardDescription>
-
-            {/* Stock Status */}
-            <div className="py-2">
-              <p className={`text-sm font-medium ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
-                {isOutOfStock ? 'Currently Out of Stock' : 'In Stock'}
-              </p>
-            </div>
-
-            {/* Size Selection */}
-            <div className="space-y-2 py-2">
-              <h3 className="font-medium">Select Size</h3>
-              {isLoadingSizes ? (
-                <div className="py-2 text-sm text-gray-500">Loading size availability...</div>
-              ) : sizeAvailability.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {sizeAvailability.map((sizeData: SizeAvailability) => {
-                    const inStock = sizeData.stock > 0;
-                    
-                    return (
-                      <Button
-                        key={sizeData.size}
-                        variant={selectedSize === sizeData.size ? "default" : "outline"}
-                        className={`px-3 py-1 sm:px-4 sm:py-2 text-sm ${
-                          selectedSize === sizeData.size
-                            ? "bg-amber-600 text-white hover:bg-amber-700"
-                            : inStock 
-                              ? "hover:bg-gray-100" 
-                              : "opacity-60 cursor-not-allowed bg-gray-100"
-                        }`}
-                        onClick={() => !isOutOfStock && inStock && setSelectedSize(sizeData.size)}
-                        disabled={isOutOfStock || !inStock}
-                      >
-                        {sizeData.size}
-                      </Button>
-                    );
-                  })}
+            {/* Right Column - Product Info */}
+            <div className="space-y-2 md:space-y-3">
+              <div className="flex items-start justify-between">
+                <CardTitle className="text-lg sm:text-xl">{product.title}</CardTitle>
+                <div className="flex items-center gap-2">
+                  {product.discount && product.discount > 0 && (
+                    <div className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded">
+                      {product.discount_type === 'flat' 
+                        ? `৳${product.discount} OFF` 
+                        : `${product.discount.toFixed(0)}% OFF`}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="py-2 text-sm text-gray-500">No sizes available for this product</div>
-              )}
+              </div>
+              
+              <div className="flex items-center space-x-2 text-base sm:text-lg font-semibold">
+                {product.discountPrice ? (
+                  <>
+                    <span className="text-red-500">৳{product.discountPrice}</span>
+                    <span className="line-through text-gray-500 text-sm sm:text-base">
+                      ৳{product.price}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-gray-700">৳{product.price}</span>
+                )}
+              </div>
+              
+              <CardDescription className="text-xs sm:text-sm py-1">
+                {product.description}
+              </CardDescription>
+
+              {/* Stock Status */}
+              <div className="py-1">
+                <p className={`text-xs sm:text-sm font-medium ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                  {isOutOfStock ? 'Currently Out of Stock' : 'In Stock'}
+                </p>
+              </div>
+
+              {/* Size Selection */}
+              <div className="space-y-1 py-1">
+                <h3 className="text-sm font-medium">Select Size</h3>
+                {isLoadingSizes ? (
+                  <div className="py-1 text-xs text-gray-500">Loading size availability...</div>
+                ) : sizeAvailability.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {sizeAvailability.map((sizeData: SizeAvailability) => {
+                      const inStock = sizeData.stock > 0;
+                      
+                      return (
+                        <Button
+                          key={sizeData.size}
+                          variant={selectedSize === sizeData.size ? "default" : "outline"}
+                          className={`px-2 py-0.5 sm:px-3 sm:py-1 text-xs ${
+                            selectedSize === sizeData.size
+                              ? "bg-amber-600 text-white hover:bg-amber-700"
+                              : inStock 
+                                ? "hover:bg-gray-100" 
+                                : "opacity-60 cursor-not-allowed bg-gray-100"
+                          }`}
+                          onClick={() => !isOutOfStock && inStock && setSelectedSize(sizeData.size)}
+                          disabled={isOutOfStock || !inStock}
+                        >
+                          {sizeData.size}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="py-1 text-xs text-gray-500">No sizes available for this product</div>
+                )}
+              </div>
+              
+              <Separator className="my-3" />
+              
+              <Button 
+                className={`w-full py-2 ${isOutOfStock 
+                  ? "bg-gray-400 hover:bg-gray-400" 
+                  : "bg-amber-600 hover:bg-amber-700"} text-white font-medium`} 
+                onClick={addToCart}
+                disabled={isOutOfStock}
+              >
+                {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+              </Button>
             </div>
-            
-            <Separator className="my-4" />
-            
-            <Button 
-              className={`w-full py-2.5 ${isOutOfStock 
-                ? "bg-gray-400 hover:bg-gray-400" 
-                : "bg-amber-600 hover:bg-amber-700"} text-white font-medium`} 
-              onClick={addToCart}
-              disabled={isOutOfStock}
-            >
-              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-            </Button>
           </div>
         </CardContent>
       </Card>

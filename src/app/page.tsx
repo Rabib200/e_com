@@ -154,6 +154,7 @@ const Header = () => {
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
   const searchRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -235,7 +236,6 @@ const Header = () => {
     }
   };
 
-
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
@@ -248,8 +248,21 @@ const Header = () => {
     setMobileSearchOpen(!mobileSearchOpen);
   };
 
+  const toggleDesktopSearch = () => {
+    setDesktopSearchOpen(!desktopSearchOpen);
+    if (!desktopSearchOpen) {
+      // Focus the input after a short delay to allow the popup to render
+      setTimeout(() => {
+        const searchInput = document.getElementById('desktop-search-input');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+    }
+  };
+
   return (
-    <header className="fixed top-0 left-0 w-full bg-black text-white p-4 md:p-6 z-50 shadow-md">
+    <header className="fixed top-0 left-0 w-full bg-black text-white p-3 md:p-4 z-50 shadow-md">
       <div className="flex items-center justify-between">
         {/* Left section - hamburger menu only */}
         <div className="md:hidden">
@@ -370,7 +383,7 @@ const Header = () => {
                   )}
                 </div>
                 
-                <nav className="space-y-4">
+                <nav >
                   <Link
                     href="/"
                     onClick={closeDrawer}
@@ -520,41 +533,42 @@ const Header = () => {
         </div>
 
         {/* Center section - logo/title */}
-        <div className="flex-1 flex justify-center items-center">
+        <div className="flex-0 flex justify-center items-center w-[150px]">
           <Link href={"/"} className="text-white">
-            <div className="relative w-[250px] md:w-[250px]">
+            <div className="relative w-[100px] md:w-[150px]">
               <Image 
                 src="/mainLogoCropped.jpg" 
                 alt="fitandkit Logo" 
-                width={250}
-                height={5000}
-                className="object-contain max-h-16"
+                width={100}
+                height={60}
+                className="object-contain max-h-10"
                 priority
               />
             </div>
           </Link>
         </div>
+        
         {/* Right section - search icon and cart for mobile */}
-        <div className="flex md:hidden items-center gap-3">
-          {/* Search icon for mobile - now to the left of cart */}
+        <div className="flex md:hidden items-center gap-2">
+          {/* Search icon for mobile */}
           <Button 
             variant="outline" 
             size="icon" 
-            className="bg-black border-white text-white hover:bg-gray-800"
+            className="bg-black border-white text-white hover:bg-gray-800 h-8 w-8"
             onClick={toggleMobileSearch}
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-4 w-4" />
             <span className="sr-only">Search</span>
           </Button>
           
           {/* Mobile cart */}
           <div className="relative">
             <FaShoppingCart
-              className="text-white text-2xl cursor-pointer"
+              className="text-white text-xl cursor-pointer"
               onClick={toggleCart}
             />
             {cartItems > 0 && (
-              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
                 {cartItems}
               </span>
             )}
@@ -562,20 +576,20 @@ const Header = () => {
         </div>
 
         {/* Desktop navigation menu - updated */}
-        <div className="hidden md:flex flex-grow justify-center">
+        <div className="hidden md:flex w-full justify-center items-center">
           <NavigationMenu viewport={false} className="relative">
-            <NavigationMenuList className="flex flex-wrap gap-2 md:gap-4">
+            <NavigationMenuList className="flex flex-wrap gap-1 md:gap-2 items-center">
               <NavigationMenuItem>
                 <NavigationMenuLink
                   href="/"
-                  className="block py-2 px-3 text-white font-bold hover:bg-gray-800 rounded-md bg-black flex items-center h-10"
+                  className="inline-flex items-center justify-center py-1 px-2 text-white font-bold hover:bg-gray-800 rounded-md bg-black h-8"
                 >
                   Home
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   JERSEY
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -596,7 +610,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   T-SHIRTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -617,7 +631,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   TROUSERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -638,7 +652,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   PANTS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -659,7 +673,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   WINTER
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -680,7 +694,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   SNEAKERS
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -701,7 +715,7 @@ const Header = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-white bg-black flex items-center h-10">
+                <NavigationMenuTrigger className="text-white bg-black flex items-center h-8">
                   Contact
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="right-0 left-auto">
@@ -724,15 +738,27 @@ const Header = () => {
           </NavigationMenu>
         </div>
 
-        {/* Desktop cart - unchanged */}
-        <div className="hidden md:block">
+        {/* Desktop search and cart */}
+        <div className="hidden md:flex items-center gap-2">
+          {/* Desktop search button */}
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="bg-black border-white text-white hover:bg-gray-800 h-8 w-8"
+            onClick={toggleDesktopSearch}
+          >
+            <Search className="h-4 w-4" />
+            <span className="sr-only">Search</span>
+          </Button>
+
+          {/* Desktop cart */}
           <div className="relative">
             <FaShoppingCart
-              className="text-white text-2xl cursor-pointer"
+              className="text-white text-xl cursor-pointer"
               onClick={toggleCart}
             />
             {cartItems > 0 && (
-              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
                 {cartItems}
               </span>
             )}
@@ -770,34 +796,34 @@ const Header = () => {
 
       {/* Mobile search box that appears when the search icon is clicked */}
       {mobileSearchOpen && (
-        <div className="md:hidden mt-4 relative w-full" ref={searchRef}>
+        <div className="md:hidden mt-2 relative w-full" ref={searchRef}>
           <form onSubmit={handleSearchSubmit}>
             <div className="relative flex items-center w-full">
               <input
                 type="search"
                 name="search"
                 placeholder="Search for products..."
-                className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
+                className="w-full py-1 px-2 text-xs rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
                 value={searchQuery}
                 onChange={handleSearchInputChange}
                 autoFocus
               />
               <button
                 type="button"
-                className="absolute right-10 text-gray-400 hover:text-white"
+                className="absolute right-8 text-gray-400 hover:text-white"
                 onClick={() => setMobileSearchOpen(false)}
                 aria-label="Close search"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
               <button
                 type="submit"
-                className="absolute right-3 text-gray-400 hover:text-white"
+                className="absolute right-2 text-gray-400 hover:text-white"
                 aria-label="Search"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
@@ -880,106 +906,127 @@ const Header = () => {
         </div>
       )}
 
-      <div className="hidden md:block mt-4 max-w-2xl mx-auto relative w-full" ref={searchRef}>
-        <form onSubmit={handleSearchSubmit}>
-          <div className="relative flex items-center w-full">
-            <input
-              type="search"
-              name="search"
-              placeholder="Search for products..."
-              className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
-              value={searchQuery}
-              onChange={handleSearchInputChange}
-            />
-            <button
-              type="submit"
-              className="absolute right-3 text-gray-400 hover:text-white"
-              aria-label="Search"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-          </div>
-        </form>
-        {showResults && (
-          <div className="absolute mt-2 w-full bg-black text-white shadow-lg rounded-lg p-4 z-[100] max-h-80 overflow-y-auto">
-            {isSearching ? (
-              <div className="flex justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-amber-600"></div>
-              </div>
-            ) : searchResults.length > 0 ? (
-              searchResults.map((result) => (
-                <Link
-                key={result.id}
-                href={`/products/${result.slug}`}
-                className="block"
-                onClick={(e) => {
-                  console.log("ON desktop Click")
-                  e.stopPropagation();
-                  setShowResults(false);
-                  setSearchQuery('');
-                }}
-              >
-                  <div className="py-2 px-2 hover:bg-gray-800 cursor-pointer rounded-md flex items-center gap-3">
-                    <div className="w-12 h-12 relative flex-shrink-0 border border-gray-700 rounded-sm overflow-hidden">
-                      {result.image && result.image[0] ? (
-                        <Image
-                          src={result.image[0]}
-                          alt={result.title}
-                          fill
-                          sizes="48px"
-                          className="object-contain"
-                        />
-                      ) : (
-                        <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500 text-xs">
-                          No image
-                        </div>
-                      )}
-                      {result.status === "Out_of_Stock" && (
-                        <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-                          <span className="text-white text-xs font-medium">Out of stock</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <p className="text-sm font-medium line-clamp-1">{result.title}</p>
-                      <div className="flex gap-2 items-center">
-                        {result.discountPrice ? (
-                          <>
-                            <span className="text-xs text-red-400">৳{result.discountPrice}</span>
-                            <span className="text-xs text-gray-400 line-through">৳{result.price}</span>
-                          </>
-                        ) : (
-                          <span className="text-xs text-gray-300">
-                            {result.price ? `৳${result.price}` : "Price not available"}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            ) : searchQuery.trim().length > 0 ? (
-              <div className="py-4 text-center">
-                <p className="text-sm">No results found for {searchQuery}</p>
-                <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
-              </div>
-            ) : null}
-            
-            {searchResults.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-gray-700 text-center">
-                <button 
-                  className="text-sm text-amber-500 hover:text-amber-400"
-                  onClick={handleSearchSubmit}
+      {/* Desktop search popup */}
+      {desktopSearchOpen && (
+        <div className="hidden md:block absolute left-0 right-0 top-16 px-4 z-50 animate-fadeIn" ref={searchRef}>
+          <div className="bg-black border border-gray-700 rounded-lg shadow-lg p-4 max-w-2xl mx-auto">
+            <form onSubmit={handleSearchSubmit}>
+              <div className="relative flex items-center w-full">
+                <input
+                  id="desktop-search-input"
+                  type="search"
+                  name="search"
+                  placeholder="Search for products..."
+                  className="w-full py-2 px-4 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-amber-500"
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                />
+                <button
+                  type="button"
+                  className="absolute right-10 text-gray-400 hover:text-white"
+                  onClick={() => setDesktopSearchOpen(false)}
+                  aria-label="Close search"
                 >
-                  See all results for {searchQuery}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+                <button
+                  type="submit"
+                  className="absolute right-3 text-gray-400 hover:text-white"
+                  aria-label="Search"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+            {showResults && (
+              <div className="mt-2 w-full bg-black text-white rounded-lg z-[100] max-h-80 overflow-y-auto">
+                {isSearching ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-amber-600"></div>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  searchResults.map((result) => (
+                    <Link
+                      key={result.id}
+                      href={`/products/${result.slug}`}
+                      className="block"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowResults(false);
+                        setSearchQuery('');
+                        setDesktopSearchOpen(false);
+                      }}
+                    >
+                      <div className="py-2 px-2 hover:bg-gray-800 cursor-pointer rounded-md flex items-center gap-3">
+                        <div className="w-12 h-12 relative flex-shrink-0 border border-gray-700 rounded-sm overflow-hidden">
+                          {result.image && result.image[0] ? (
+                            <Image
+                              src={result.image[0]}
+                              alt={result.title}
+                              fill
+                              sizes="48px"
+                              className="object-contain"
+                            />
+                          ) : (
+                            <div className="bg-gray-800 w-full h-full flex items-center justify-center text-gray-500 text-xs">
+                              No image
+                            </div>
+                          )}
+                          {result.status === "Out_of_Stock" && (
+                            <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                              <span className="text-white text-xs font-medium">Out of stock</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <p className="text-sm font-medium line-clamp-1">{result.title}</p>
+                          <div className="flex gap-2 items-center">
+                            {result.discountPrice ? (
+                              <>
+                                <span className="text-xs text-red-400">৳{result.discountPrice}</span>
+                                <span className="text-xs text-gray-400 line-through">৳{result.price}</span>
+                              </>
+                            ) : (
+                              <span className="text-xs text-gray-300">
+                                {result.price ? `৳${result.price}` : "Price not available"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                ) : searchQuery.trim().length > 0 ? (
+                  <div className="py-4 text-center">
+                    <p className="text-sm">No results found for &quot;{searchQuery}&quot;</p>
+                    <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+                  </div>
+                ) : null}
+                
+                {searchResults.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-gray-700 text-center">
+                    <button 
+                      className="block py-2 text-sm text-amber-500 hover:text-amber-400 w-full"
+                      onClick={() => {
+                        router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                        setDesktopSearchOpen(false);
+                        setShowResults(false);
+                        setSearchQuery('');
+                      }}
+                    >
+                      See all results for &quot;{searchQuery}&quot;
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 };
