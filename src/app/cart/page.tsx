@@ -195,7 +195,7 @@ const CartPage = () => {
                     )}
                   </TableCell>
                   <TableCell>{item.size || "N/A"}</TableCell>
-                  <TableCell>${item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
+                  <TableCell>৳{item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
                   <TableCell>
                     <input
                       type="number"
