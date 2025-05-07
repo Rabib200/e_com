@@ -310,7 +310,7 @@ export default function ProductDetails() {
                 )}
               </div>
               
-              <CardDescription className="text-xs sm:text-sm py-1">
+              <CardDescription className="text-xs sm:text-sm py-1 whitespace-pre-line">
                 {product.description}
               </CardDescription>
 
