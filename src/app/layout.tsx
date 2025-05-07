@@ -78,6 +78,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+      <meta name="google-site-verification" content="VtKhjpCImp3wHlFsw-5hQM1Se_LGBCDclGVeLI8YLf8" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
         {/* <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" /> */}
         {/* <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" /> */}
