@@ -15,8 +15,49 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fit & Kit",
-  description: "Find the Best Apparel for You",
+  metadataBase: new URL('https://fitandkit.com'),
+  title: {
+    default: "Fit & Kit - Premium Apparel Collection",
+    template: "%s | Fit & Kit"
+  },
+  description: "Find the Best Premium Quality Jerseys, Stylish T-shirts, and Fashionable Sportswear at Fit & Kit",
+  keywords: ["apparel", "jerseys", "t-shirts", "sportswear", "fashion", "clothing", "Fit & Kit"],
+  openGraph: {
+    title: "Fit & Kit - Premium Apparel Collection",
+    description: "Find the Best Premium Quality Jerseys, Stylish T-shirts, and Fashionable Sportswear at Fit & Kit",
+    url: "https://fitandkit.com",
+    siteName: "Fit & Kit",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: '/mainLogoCropped.jpg',
+        width: 800,
+        height: 600,
+        alt: "Fit & Kit Logo",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fit & Kit - Premium Apparel Collection",
+    description: "Find the Best Premium Quality Jerseys, Stylish T-shirts, and Fashionable Sportswear at Fit & Kit",
+    images: ['/mainLogoCropped.jpg'],
+  },
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       { url: './favicon.ico' },
