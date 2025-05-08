@@ -1154,7 +1154,6 @@ const Home = () => {
 
   return (
     <div>
-      <Header />
       <main className="p-4 sm:p-8 mt-32 sm:mt-36">
         <section className="bg-gradient-to-br from-gray-50 to-gray-200 p-4 sm:p-6 rounded-lg shadow-md">
           <div className="mb-6 sm:mb-8">
