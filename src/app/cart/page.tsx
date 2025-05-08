@@ -230,13 +230,13 @@ const CartPage = () => {
               <h2 className="text-lg font-semibold mb-2">Cart Totals</h2>
               <div className="flex justify-between mb-1">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>৳{subtotal.toFixed(2)}</span>
               </div>
-
+{/* 
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
+                <span>{subtotal.toFixed(2)}</span>
+              </div> */}
               
               {/* Show warning if out-of-stock items exist */}
               {cart.some((item: CartItem) => !isItemInStock(item)) && (
