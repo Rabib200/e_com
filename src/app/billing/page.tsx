@@ -221,7 +221,7 @@ const BillingPage = () => {
   };
 
   const copyBkashNumber = () => {
-    const bkashNumber = "01701503990";
+    const bkashNumber = "01953965548";
     navigator.clipboard.writeText(bkashNumber)
       .then(() => {
         setCopying(true);
@@ -401,9 +401,9 @@ const BillingPage = () => {
           </div>
 
           <div className="p-4 border rounded-md mb-4 border-amber-900 bg-amber-600 text-white">
-            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay using bKash *SEND MONEY*</p>
+            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay using bKash/Nagad/Rocket *SEND MONEY*</p>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-bold text-lg sm:text-xl">bKash: 01701503990</p>
+              <p className="font-bold text-lg sm:text-xl">01953965548</p>
               <button 
                 onClick={copyBkashNumber}
                 className="p-1.5 sm:p-2 rounded-md bg-white/20 hover:bg-white/30 transition-colors flex items-center"
