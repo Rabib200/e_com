@@ -301,9 +301,11 @@ export default function ProductDetails() {
                 {product.discountPrice ? (
                   <>
                     <span className="text-red-500">৳{product.discountPrice}</span>
-                    <span className="line-through text-gray-500 text-sm sm:text-base">
-                      ৳{product.price}
-                    </span>
+                    {product.price !== product.discountPrice && (
+                      <span className="line-through text-gray-500 text-sm sm:text-base">
+                        ৳{product.price}
+                      </span>
+                    )}
                   </>
                 ) : (
                   <span className="text-gray-700">৳{product.price}</span>

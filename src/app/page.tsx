@@ -1253,56 +1253,98 @@ const Home = () => {
                 trending.map((product, index) => (
                   <CarouselItem 
                     key={product.id} 
-                    className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5"
+                    className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2"
                     onClick={() => handleBuyNow(product.slug)}
                   >
-                    <div className="relative h-48 sm:h-64 w-full cursor-pointer">
+                    <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
                       <Image
                         src={product.image[0] || "/placeholder.webp"}
                         alt={product.title || `Trending Product ${index + 1}`}
-                        width={400}
-                        height={400}
-                        className="h-full w-full object-cover rounded-md"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        fill
+                        className="object-contain p-2"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         priority
                       />
+                      {product.status === "Out_of_Stock" && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                          <div className="bg-black bg-opacity-70 text-white px-3 py-1.5 text-sm sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
+                            Out of Stock
+                          </div>
+                        </div>
+                      )}
+                      {product.discount && product.discount > 0 && product.status !== "Out_of_Stock" && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-md">
+                          {product.discount_type === 'flat' 
+                            ? `৳${product.discount} OFF` 
+                            : `${product.discount.toFixed(0)}% OFF`}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-2 text-center">
+                      <h3 className="text-sm sm:text-base font-medium line-clamp-1">{product.title}</h3>
+                      {(product.price || product.discountPrice) && (
+                        <div className="flex items-center justify-center space-x-2 text-sm mt-0.5">
+                          {product.discountPrice ? (
+                            <>
+                              <span className="text-red-500 font-medium">৳{product.discountPrice}</span>
+                              {product.price !== product.discountPrice && (
+                                <span className="line-through text-gray-500 text-xs">৳{product.price}</span>
+                              )}
+                            </>
+                          ) : product.price ? (
+                            <span className="text-gray-700 font-medium">৳{product.price}</span>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
                   </CarouselItem>
                 ))
               ) : (
                 <>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                    <Image
-                      src="/p1.webp"
-                      alt="Product 1"
-                      width={400}
-                      height={400}
-                      className="h-48 sm:h-64 w-full object-cover rounded-md"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      priority
-                    />
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                    <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
+                      <Image
+                        src="/p1.webp"
+                        alt="Product 1"
+                        fill
+                        className="object-contain p-2"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        priority
+                      />
+                    </div>
+                    <div className="mt-2 text-center">
+                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    </div>
                   </CarouselItem>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                    <Image
-                      src="/p2.webp"
-                      alt="Product 2"
-                      width={400}
-                      height={400}
-                      className="h-48 sm:h-64 w-full object-cover rounded-md"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      priority
-                    />
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                    <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
+                      <Image
+                        src="/p2.webp"
+                        alt="Product 2"
+                        fill
+                        className="object-contain p-2"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        priority
+                      />
+                    </div>
+                    <div className="mt-2 text-center">
+                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    </div>
                   </CarouselItem>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
-                    <Image
-                      src="/p3.webp"
-                      alt="Product 3"
-                      width={400}
-                      height={400}
-                      className="h-48 sm:h-64 w-full object-cover rounded-md"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      priority
-                    />
+                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                    <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
+                      <Image
+                        src="/p3.webp"
+                        alt="Product 3"
+                        fill
+                        className="object-contain p-2"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        priority
+                      />
+                    </div>
+                    <div className="mt-2 text-center">
+                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    </div>
                   </CarouselItem>
                 </>
               )}
@@ -1311,6 +1353,7 @@ const Home = () => {
             <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
           </Carousel>
         </div>
+
         <h6 className="flex justify-center mt-10">
           <b className="text-5xl font-stretch-50% fill-amber-800">
             NEW ARRIVALS !!!
@@ -1371,9 +1414,11 @@ const Home = () => {
                             <span className="text-red-500 font-medium">
                               ৳{product.discountPrice}
                             </span>
-                            <span className="line-through text-gray-500 text-xs">
-                              ৳{product.price}
-                            </span>
+                            {product.price !== product.discountPrice && (
+                              <span className="line-through text-gray-500 text-xs">
+                                ৳{product.price}
+                              </span>
+                            )}
                           </>
                         ) : product.price ? (
                           <span className="text-gray-700 font-medium">

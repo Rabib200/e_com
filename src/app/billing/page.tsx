@@ -17,7 +17,7 @@ interface ShippingOption {
 }
 
 const shippingOptions: ShippingOption[] = [
-  { id: "inside_dhaka", label: "Inside Dhaka", price: 80 },
+  { id: "inside_dhaka", label: "Inside Dhaka", price: 60 },
   { id: "outside_dhaka", label: "Outside Dhaka", price: 120 }
 ];
 
@@ -242,33 +242,37 @@ const BillingPage = () => {
           </div>
           <Card>
             <CardContent className="p-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <ShoppingBag className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="text-sm">
-                        {item.title} {item.size && `(${item.size})`} x {item.quantity}
-                      </span>
+                  <div key={item.id} className="grid grid-cols-[1fr_auto] gap-2 items-start py-1 border-b border-gray-100">
+                    <div className="break-words">
+                      <div className="flex items-start">
+                        <ShoppingBag className="h-4 w-4 mr-2 text-gray-500 mt-1 flex-shrink-0" />
+                        <span className="text-sm">
+                          {item.title} {item.size && `(${item.size})`}
+                          <span className="block text-xs text-gray-500">x{item.quantity}</span>
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium">
+                    <div className="text-right text-sm font-medium whitespace-nowrap">
                       ৳{formatCurrency(calculateItemTotal(item))}
-                    </span>
+                    </div>
                   </div>
                 ))}
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Subtotal</span>
-                    <span className="text-sm">৳{formatCurrency(calculateSubtotal())}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Shipping ({selectedShipping.label})</span>
-                    <span className="text-sm">৳{selectedShipping.price}</span>
-                  </div>
-                  <div className="flex justify-between items-center font-bold mt-1">
-                    <span>Total</span>
-                    <span>৳{formatCurrency(calculateTotal())}</span>
-                  </div>
+                
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-center py-1">
+                  <div className="text-sm">Subtotal</div>
+                  <div className="text-right text-sm whitespace-nowrap">৳{formatCurrency(calculateSubtotal())}</div>
+                </div>
+                
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-center py-1">
+                  <div className="text-sm">Shipping ({selectedShipping.label})</div>
+                  <div className="text-right text-sm whitespace-nowrap">৳{selectedShipping.price}</div>
+                </div>
+                
+                <div className="grid grid-cols-[1fr_auto] gap-2 items-center py-1 pt-2 border-t border-gray-200">
+                  <div className="font-bold">Total</div>
+                  <div className="text-right whitespace-nowrap font-bold">৳{formatCurrency(calculateTotal())}</div>
                 </div>
               </div>
             </CardContent>
@@ -353,55 +357,55 @@ const BillingPage = () => {
             <h2 className="text-xl sm:text-2xl font-bold mb-4">Your Order</h2>
             <Card className="mb-6">
               <CardContent className="p-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cart.length > 0 ? (
-                      cart.map((item) => {
+                <div className="w-full">
+                  <div className="grid grid-cols-[1fr_auto] border-b pb-2 mb-2">
+                    <div className="font-semibold">Product</div>
+                    <div className="font-semibold text-right">Total</div>
+                  </div>
+                  
+                  {cart.length > 0 ? (
+                    <div className="space-y-3">
+                      {cart.map((item) => {
                         const itemTotal = calculateItemTotal(item);
                         
                         return (
-                          <TableRow key={item.id}>
-                            <TableCell className="py-2">
-                              {item.title} {item.size && `(${item.size})`}
-                              <span className="block text-xs text-gray-500">
-                                x{item.quantity}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right py-2">৳{formatCurrency(itemTotal)}</TableCell>
-                          </TableRow>
+                          <div key={item.id} className="grid grid-cols-[1fr_auto] gap-4 items-start py-1 border-b border-gray-100">
+                            <div className="break-words pr-2">
+                              <span className="block">{item.title} {item.size && `(${item.size})`}</span>
+                              <span className="block text-xs text-gray-500">x{item.quantity}</span>
+                            </div>
+                            <div className="text-right whitespace-nowrap pl-4 font-medium">
+                              ৳{formatCurrency(itemTotal)}
+                            </div>
+                          </div>
                         );
-                      })
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={2} className="text-center py-4">Your cart is empty</TableCell>
-                      </TableRow>
-                    )}
-                    <TableRow>
-                      <TableCell className="font-medium py-2">Subtotal</TableCell>
-                      <TableCell className="text-right py-2">৳{formatCurrency(calculateSubtotal())}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium py-2">Shipping ({selectedShipping.label})</TableCell>
-                      <TableCell className="text-right py-2">৳{selectedShipping.price}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-bold text-lg py-2">Total</TableCell>
-                      <TableCell className="text-right font-bold text-lg py-2">৳{formatCurrency(calculateTotal())}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                      })}
+                      
+                      <div className="grid grid-cols-[1fr_auto] gap-4 items-center py-1">
+                        <div className="font-medium">Subtotal</div>
+                        <div className="text-right whitespace-nowrap">৳{formatCurrency(calculateSubtotal())}</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-[1fr_auto] gap-4 items-center py-1">
+                        <div className="font-medium">Shipping ({selectedShipping.label})</div>
+                        <div className="text-right whitespace-nowrap">৳{selectedShipping.price}</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-[1fr_auto] gap-4 items-center py-1 pt-2 border-t border-gray-200">
+                        <div className="font-bold text-lg">Total</div>
+                        <div className="text-right whitespace-nowrap font-bold text-lg">৳{formatCurrency(calculateTotal())}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4">Your cart is empty</div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
 
           <div className="p-4 border rounded-md mb-4 border-amber-900 bg-amber-600 text-white">
-            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay using bKash/Nagad/Rocket *SEND MONEY*</p>
+            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay the shipping charge using bKash/Nagad/Rocket *SEND MONEY*</p>
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-bold text-lg sm:text-xl">01953965548</p>
               <button 
@@ -425,14 +429,14 @@ const BillingPage = () => {
             
             <div className="mt-4">
               <Label htmlFor="transaction-id" className="text-white text-sm sm:text-base">
-                bKash Transaction ID *
+               Transaction ID/ Phone Number *
               </Label>
               <div className="flex mt-1">
                 <div className="relative flex-grow">
                   <CreditCard className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-800" />
                   <Input
                     id="transaction-id"
-                    placeholder="Enter your bKash Transaction ID"
+                    placeholder="Enter your Transaction ID/ Phone Number"
                     value={transactionId}
                     onChange={handleTransactionIdChange}
                     className="pl-8 bg-white/90 text-amber-900 placeholder:text-amber-700/60 border-amber-800"
@@ -444,7 +448,7 @@ const BillingPage = () => {
                 <p className="text-xs text-amber-200 mt-1">{transactionIdError}</p>
               )}
               <p className="text-xs text-amber-200 mt-1">
-                After making payment via bKash, enter the Transaction ID you received.
+                After making payment, enter the Transaction ID you received.
               </p>
             </div>
           </div>
