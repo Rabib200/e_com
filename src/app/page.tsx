@@ -134,12 +134,12 @@ const components: { title: string; href: string; description: string }[] = [
 
   {
     title: "Customer Support",
-    href: "#",
+    href: "/contact",
     description: "Get help with your orders and inquiries.",
   },
   {
     title: "FAQ",
-    href: "#",
+    href: "/faq",
     description: "Find answers to common questions.",
   },
 ];
@@ -1084,9 +1084,18 @@ const Footer = () => {
                 <span>📍</span> Dhaka, Bangladesh
               </p>
             </div>
+            
+            {/* Opening Time information */}
+            <div className="mt-2 pt-2 border-t border-gray-800 w-full">
+              <h4 className="text-sm font-semibold mb-1 text-amber-500 text-center md:text-left">Opening Time</h4>
+              <p className="text-xs text-gray-300 text-center md:text-left">1. Online platform: We are always open</p>
+              <p className="text-xs text-gray-300 text-center md:text-left">2. Outlet: Saturday – Friday, from 5 PM to 11 PM</p>
+              <p className="text-xs text-gray-300 italic mt-1 text-center md:text-left">We look forward to serving you and ensuring you have a great shopping experience with us!</p>
+            </div>
+            
             <div className="flex justify-center md:justify-start space-x-4 pt-2">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/fitandkits"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-amber-400 transition-colors"
@@ -1102,7 +1111,7 @@ const Footer = () => {
                 <FaTwitter className="text-xl" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/fitandkit.store?igsh=MTUxOXhzcTNib2loZg=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-amber-400 transition-colors"
@@ -1132,7 +1141,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-amber-400 transition-colors">
+                <Link href="/privacy-policy" className="hover:text-amber-400 transition-colors">
                   Privacy Policy
                 </Link>
               </li>
