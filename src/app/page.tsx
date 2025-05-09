@@ -1059,42 +1059,131 @@ ListItem.displayName = "ListItem";
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-white p-4 text-center">
-      <div className="mb-4">
-        <p>Contact us: +123 456 7890</p>
-        <p>Address: 123 Fit&Kit St, Dhaka, Bangladesh</p>
+    <footer className="bg-black text-white py-8 px-4">
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Footer Column 1 - Company Info */}
+          <div className="flex flex-col items-center md:items-start space-y-3">
+            <div className="relative w-[150px] h-[80px]">
+              <Image 
+                src="/mainLogoCropped.jpg" 
+                alt="Fit & Kit Logo" 
+                fill
+                className="object-contain"
+                sizes="150px"
+              />
+            </div>
+            <div className="space-y-2 text-center md:text-left">
+              <p className="flex items-center justify-center md:justify-start gap-2">
+                <span>📧</span> fitandkit.store@gmail.com
+              </p>
+              <p className="flex items-center justify-center md:justify-start gap-2">
+                <span>📞</span> 019539655548
+              </p>
+              <p className="flex items-center justify-center md:justify-start gap-2">
+                <span>📍</span> Dhaka, Bangladesh
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-start space-x-4 pt-2">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-amber-400 transition-colors"
+              >
+                <FaFacebook className="text-xl" />
+              </a>
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-amber-400 transition-colors"
+              >
+                <FaTwitter className="text-xl" />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-amber-400 transition-colors"
+              >
+                <FaInstagram className="text-xl" />
+              </a>
+            </div>
+          </div>
+          
+          {/* Footer Column 2 - Policies */}
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-xl font-semibold mb-4 text-amber-500">Company</h3>
+            <ul className="space-y-2 text-center md:text-left">
+              <li>
+                <Link href="/about" className="hover:text-amber-400 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-amber-400 transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/return-policy" className="hover:text-amber-400 transition-colors">
+                  Return & Exchange Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-amber-400 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+            </ul>
+          </div>
+          
+          {/* Footer Column 3 - Useful Links */}
+          <div className="flex flex-col items-center md:items-start">
+            <h3 className="text-xl font-semibold mb-4 text-amber-500">Useful Links</h3>
+            <ul className="space-y-2 text-center md:text-left mb-4">
+              <li>
+                <Link href="/contact" className="hover:text-amber-400 transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <a 
+                  href="https://maps.app.goo.gl/pysYQr8Sdx4xy2TCA" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-amber-400 transition-colors flex items-center gap-1"
+                >
+                  <span>Find our Outlet</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+              </li>
+            </ul>
+            <div className="w-full h-40 md:h-48 rounded-lg overflow-hidden border border-gray-700">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3652.9260138934174!2d90.43092697601483!3d23.713870484588087!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDQyJzUwLjAiTiA5MMKwMjYnMDAuNyJF!5e0!3m2!1sen!2sbd!4v1715356358821!5m2!1sen!2sbd" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Fit & Kit Outlet Location"
+                className="filter grayscale hover:grayscale-0 transition-all duration-300"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="border-t border-gray-800 mt-8 pt-6 text-center">
+          <p>&copy; {new Date().getFullYear()} Fit & Kit. All rights reserved.</p>
+        </div>
       </div>
-      <div className="flex justify-center space-x-4 mb-4">
-        <a
-          href="https://facebook.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white hover:text-gray-300"
-        >
-          <FaFacebook className="text-2xl" />
-        </a>
-        <a 
-          href="https://twitter.com" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-white hover:text-gray-300"
-        >
-          <FaTwitter className="text-2xl" />
-        </a>
-        <a
-          href="https://instagram.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white hover:text-gray-300"
-        >
-          <FaInstagram className="text-2xl" />
-        </a>
-      </div>
-      <p className="mb-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia
-        odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada.
-      </p>
-      <p>&copy; {new Date().getFullYear()} Fit & Kit</p>
     </footer>
   );
 };
