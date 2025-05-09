@@ -1243,13 +1243,13 @@ const Home = () => {
 
   return (
     <div>
-      <main className="p-4 sm:p-8 mt-32 sm:mt-36">
+      <main className="p-4 sm:p-8 mt-16 ">
         <section className="bg-gradient-to-br from-gray-50 to-gray-200 p-4 sm:p-6 rounded-lg shadow-md">
-          <div className="mb-6 sm:mb-8">
+          <div className="mb-4 sm:mb-6">
             <Carousel autoPlay autoPlayInterval={5000} className="w-full">
               <CarouselContent>
                 <CarouselItem>
-                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                  <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
                       src="/mainBanner.jpg"
                       alt="main Banner"
@@ -1265,7 +1265,7 @@ const Home = () => {
                   </div>
                 </CarouselItem>
                 <CarouselItem>
-                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                  <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
                       src="/banner1.webp"
                       alt="Eid Banner"
@@ -1281,7 +1281,7 @@ const Home = () => {
                   </div>
                 </CarouselItem>
                 <CarouselItem>
-                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                  <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
                       src="/banner2.webp"
                       alt="Live Now Banner"
@@ -1297,7 +1297,7 @@ const Home = () => {
                   </div>
                 </CarouselItem>
                 <CarouselItem>
-                  <div className="h-64 sm:h-80 md:h-96 relative overflow-hidden rounded-lg">
+                  <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
                       src="/banner3.webp"
                       alt="Flash Sale Banner"
@@ -1318,31 +1318,30 @@ const Home = () => {
             </Carousel>
           </div>
 
-          <div className="text-center px-3 py-6 sm:py-8 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 mb-4">
+          <div className="text-center px-2 py-2 sm:px-3 sm:py-4 md:py-5 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 mb-1 sm:mb-2">
               Explore the Best Apparel Collection
             </h2>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto mb-6 leading-relaxed">
+            <p className="text-[10px] sm:text-xs md:text-sm text-gray-700 max-w-xl mx-auto leading-tight">
               Discover premium quality jerseys, stylish t-shirts, and
-              fashionable sportswear for every occasion. Authentic designs with
-              unmatched comfort.
+              fashionable sportswear for every occasion.
             </p>
           </div>
         </section>
 
-        <h6 className="flex justify-center mt-10 sm:mt-16">
-          <b className="text-3xl sm:text-5xl font-stretch-50% fill-amber-800">
+        <h6 className="flex justify-center mt-6 sm:mt-10">
+          <b className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-stretch-50% fill-amber-800">
             TOP SELLING !!!
           </b>
         </h6>
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-4 sm:mt-8">
           <Carousel autoPlay autoPlayInterval={3000} className="w-full">
             <CarouselContent>
               {trending.length > 0 ? (
                 trending.map((product, index) => (
                   <CarouselItem 
                     key={product.id} 
-                    className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2"
+                    className="basis-1/3 md:basis-1/3 lg:basis-1/4 p-1 sm:p-2"
                     onClick={() => handleBuyNow(product.slug)}
                   >
                     <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
@@ -1351,33 +1350,33 @@ const Home = () => {
                         alt={product.title || `Trending Product ${index + 1}`}
                         fill
                         className="object-contain p-2"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
                         priority
                       />
                       {product.status === "Out_of_Stock" && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                          <div className="bg-black bg-opacity-70 text-white px-3 py-1.5 text-sm sm:text-base font-bold rounded-md transform rotate-[-15deg] shadow-lg">
+                          <div className="bg-black bg-opacity-70 text-white px-2 py-1 text-xs sm:text-sm font-bold rounded-md transform rotate-[-15deg] shadow-lg">
                             Out of Stock
                           </div>
                         </div>
                       )}
                       {product.discount && product.discount > 0 && product.status !== "Out_of_Stock" && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs font-bold rounded-md">
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-red-500 text-white px-1 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md">
                           {product.discount_type === 'flat' 
                             ? `৳${product.discount} OFF` 
                             : `${product.discount.toFixed(0)}% OFF`}
                         </div>
                       )}
                     </div>
-                    <div className="mt-2 text-center">
-                      <h3 className="text-sm sm:text-base font-medium line-clamp-1">{product.title}</h3>
+                    <div className="mt-1 sm:mt-2 text-center">
+                      <h3 className="text-xs sm:text-sm font-medium line-clamp-1">{product.title}</h3>
                       {(product.price || product.discountPrice) && (
-                        <div className="flex items-center justify-center space-x-2 text-sm mt-0.5">
+                        <div className="flex items-center justify-center space-x-1 sm:space-x-2 text-xs sm:text-sm mt-0.5">
                           {product.discountPrice ? (
                             <>
                               <span className="text-red-500 font-medium">৳{product.discountPrice}</span>
                               {product.price !== product.discountPrice && (
-                                <span className="line-through text-gray-500 text-xs">৳{product.price}</span>
+                                <span className="line-through text-gray-500 text-[10px] sm:text-xs">৳{product.price}</span>
                               )}
                             </>
                           ) : product.price ? (
@@ -1390,61 +1389,61 @@ const Home = () => {
                 ))
               ) : (
                 <>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                  <CarouselItem className="basis-1/3 md:basis-1/3 lg:basis-1/4 p-1 sm:p-2">
                     <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
                       <Image
                         src="/p1.webp"
                         alt="Product 1"
                         fill
                         className="object-contain p-2"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
                         priority
                       />
                     </div>
-                    <div className="mt-2 text-center">
-                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    <div className="mt-1 sm:mt-2 text-center">
+                      <h3 className="text-xs sm:text-sm font-medium">Sample Product</h3>
                     </div>
                   </CarouselItem>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                  <CarouselItem className="basis-1/3 md:basis-1/3 lg:basis-1/4 p-1 sm:p-2">
                     <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
                       <Image
                         src="/p2.webp"
                         alt="Product 2"
                         fill
                         className="object-contain p-2"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
                         priority
                       />
                     </div>
-                    <div className="mt-2 text-center">
-                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    <div className="mt-1 sm:mt-2 text-center">
+                      <h3 className="text-xs sm:text-sm font-medium">Sample Product</h3>
                     </div>
                   </CarouselItem>
-                  <CarouselItem className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 p-2">
+                  <CarouselItem className="basis-1/3 md:basis-1/3 lg:basis-1/4 p-1 sm:p-2">
                     <div className="relative aspect-square w-full cursor-pointer rounded-md overflow-hidden border border-gray-200">
                       <Image
                         src="/p3.webp"
                         alt="Product 3"
                         fill
                         className="object-contain p-2"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 33vw, (max-width: 1024px) 33vw, 25vw"
                         priority
                       />
                     </div>
-                    <div className="mt-2 text-center">
-                      <h3 className="text-sm sm:text-base font-medium">Sample Product</h3>
+                    <div className="mt-1 sm:mt-2 text-center">
+                      <h3 className="text-xs sm:text-sm font-medium">Sample Product</h3>
                     </div>
                   </CarouselItem>
                 </>
               )}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2" />
-            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2" />
+            <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8" />
+            <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8" />
           </Carousel>
         </div>
 
-        <h6 className="flex justify-center mt-10">
-          <b className="text-5xl font-stretch-50% fill-amber-800">
+        <h6 className="flex justify-center mt-6 sm:mt-10">
+          <b className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-stretch-50% fill-amber-800">
             NEW ARRIVALS !!!
           </b>
         </h6>
