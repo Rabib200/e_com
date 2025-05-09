@@ -1276,7 +1276,7 @@ const Home = () => {
                 <CarouselItem>
                   <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
-                      src="/banner1.webp"
+                      src="/FK COVER 3.png"
                       alt="Eid Banner"
                       fill
                       style={{
@@ -1292,7 +1292,7 @@ const Home = () => {
                 <CarouselItem>
                   <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
-                      src="/banner2.webp"
+                      src="/FK COVER 2.2.png"
                       alt="Live Now Banner"
                       fill
                       style={{
@@ -1308,7 +1308,23 @@ const Home = () => {
                 <CarouselItem>
                   <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
                     <Image
-                      src="/banner3.webp"
+                      src="/Fit & kit cover.jpg"
+                      alt="Flash Sale Banner"
+                      fill
+                      style={{
+                        objectFit: "contain",
+                        backgroundColor: "#f8f8f8",
+                      }}
+                      className="w-full h-full"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                      priority
+                    />
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="h-40 sm:h-64 md:h-80 lg:h-96 relative overflow-hidden rounded-lg">
+                    <Image
+                      src="/fk cover 5.png"
                       alt="Flash Sale Banner"
                       fill
                       style={{
