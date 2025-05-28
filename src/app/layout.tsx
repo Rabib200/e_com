@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer, Header } from "./page";
 import { Toaster } from "sonner";
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -77,14 +78,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
+      <Head>
+        <title>Fit & Kit - Premium Apparel Collection </title>
       <meta name="google-site-verification" content="VtKhjpCImp3wHlFsw-5hQM1Se_LGBCDclGVeLI8YLf8" />
         {/* <link rel="icon" href="/favicon.ico" /> */}
         {/* <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" /> */}
         {/* <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" /> */}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
-      </head>
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
