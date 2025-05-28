@@ -10,6 +10,7 @@ export interface CartItem {
   discountPrice?: number;
   price: number;
   size: string;
+  color?: string; // Added color property
   status?: ProductStatus;
 }
 

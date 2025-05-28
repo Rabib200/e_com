@@ -248,7 +248,7 @@ const BillingPage = () => {
                       <div className="flex items-start">
                         <ShoppingBag className="h-4 w-4 mr-2 text-gray-500 mt-1 flex-shrink-0" />
                         <span className="text-sm">
-                          {item.title} {item.size && `(${item.size})`}
+                          {item.title} {item.size && `(${item.size}${item.color ? `, ${item.color}` : ''})`}
                           <span className="block text-xs text-gray-500">x{item.quantity}</span>
                         </span>
                       </div>
@@ -370,7 +370,7 @@ const BillingPage = () => {
                         return (
                           <div key={item.id} className="grid grid-cols-[1fr_auto] gap-4 items-start py-1 border-b border-gray-100">
                             <div className="break-words pr-2">
-                              <span className="block">{item.title} {item.size && `(${item.size})`}</span>
+                              <span className="block">{item.title} {item.size && `(${item.size}${item.color ? `, ${item.color}` : ''})`}</span>
                               <span className="block text-xs text-gray-500">x{item.quantity}</span>
                             </div>
                             <div className="text-right whitespace-nowrap pl-4 font-medium">

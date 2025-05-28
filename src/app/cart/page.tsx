@@ -161,6 +161,7 @@ const CartPage = () => {
               <TableHead>Image</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Size</TableHead>
+              <TableHead>Color</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Total</TableHead>
@@ -195,6 +196,7 @@ const CartPage = () => {
                     )}
                   </TableCell>
                   <TableCell>{item.size || "N/A"}</TableCell>
+                  <TableCell>{item.color || "N/A"}</TableCell>
                   <TableCell>৳{item.discountPrice ? item.discountPrice.toFixed(2) : item.price.toFixed(2)}</TableCell>
                   <TableCell>
                     <input
@@ -216,7 +218,7 @@ const CartPage = () => {
               );
             }) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">Your cart is empty</TableCell>
+                <TableCell colSpan={8} className="text-center py-4">Your cart is empty</TableCell>
               </TableRow>
             )}
           </TableBody>

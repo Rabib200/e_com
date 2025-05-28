@@ -41,17 +41,21 @@ interface SizeAvailability {
   size: string;
   stock: number;
   product_id: UUID;
+  color?: string; // Optional color property
 }
 
 export default function ProductDetails() {
   const router = useRouter();
-  const { slug } = useParams();
+  const params = useParams() || {};
+  const slug = typeof params.slug === 'string' ? params.slug : Array.isArray(params.slug) ? params.slug[0] : '';
   const [product, setProduct] = useState<Product>();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [sizeAvailability, setSizeAvailability] = useState<SizeAvailability[]>([]);
   const [isLoadingSizes, setIsLoadingSizes] = useState(true);
+  const [availableColors, setAvailableColors] = useState<string[]>([]);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -64,6 +68,37 @@ export default function ProductDetails() {
       setCart([]);
     }
   }, []);
+
+  // Function to update available colors based on selected size
+  const updateAvailableColorsForSize = (size: string) => {
+    if (!size || !sizeAvailability.length) {
+      setAvailableColors([]);
+      return;
+    }
+    
+    // Find all colors available for this size with stock > 0
+    const colorsForSize = sizeAvailability
+      .filter((item: SizeAvailability) => 
+        item.size === size && 
+        item.color && 
+        item.stock > 0
+      )
+      .map((item: SizeAvailability) => item.color as string)
+      .filter((color: string | undefined): color is string => Boolean(color));
+    
+    // Remove duplicates
+    const uniqueColors = [...new Set(colorsForSize)];
+    setAvailableColors(uniqueColors);
+    
+    // Reset selected color if current selection is not available for this size
+    if (uniqueColors.length > 0) {
+      if (!uniqueColors.includes(selectedColor)) {
+        setSelectedColor(""); // Don't auto-select a color
+      }
+    } else {
+      setSelectedColor("");
+    }
+  };
 
   // Fetch product by slug using Axios
   useEffect(() => {
@@ -92,14 +127,35 @@ export default function ProductDetails() {
               // Set the first size with available stock as the default selected size
               const availableSize = sizesData.sizes.find((item: SizeAvailability) => item.stock > 0);
               if (availableSize) {
+                // Set selected size
                 setSelectedSize(availableSize.size);
+                
+                // Find available colors for this size
+                const colorsForSelectedSize = sizesData.sizes
+                  .filter((item: SizeAvailability) => 
+                    item.size === availableSize.size && 
+                    item.color && 
+                    item.stock > 0
+                  )
+                  .map((item: SizeAvailability) => item.color as string)
+                  .filter((color: string | undefined): color is string => Boolean(color));
+                
+                // Remove duplicates
+                const uniqueColors = [...new Set(colorsForSelectedSize)];
+                setAvailableColors(uniqueColors);
+                
+                // Do not set a default color - user must choose after size selection
+                setSelectedColor("");
               } else if (sizesData.sizes.length > 0) {
                 // If no sizes have stock, still select the first one to show it as out of stock
                 setSelectedSize(sizesData.sizes[0].size);
+                setAvailableColors([]);
+                setSelectedColor("");
               }
             } else {
               console.error("Failed to fetch sizes:", sizesData.error);
               setSizeAvailability([]);
+              setAvailableColors([]);
             }
           } catch (sizesError) {
             console.error("Error fetching sizes:", sizesError);
@@ -120,9 +176,11 @@ export default function ProductDetails() {
     fetchProduct();
   }, [slug]);
 
-  // Function to check if a specific size is in stock
-  const isSizeInStock = (size: string): boolean => {
-    const sizeData = sizeAvailability.find((item: SizeAvailability) => item.size === size);
+  // Function to check if a specific size and color combination is in stock
+  const isSizeInStock = (size: string, color?: string): boolean => {
+    const sizeData = sizeAvailability.find((item: SizeAvailability) => 
+      item.size === size && (!color || item.color === color)
+    );
     if (!sizeData) return true; // Default to true if size not found in table
     return sizeData.stock > 0;
   };
@@ -136,22 +194,35 @@ export default function ProductDetails() {
   const addToCart = () => {
     if (!product || !selectedSize) return;
     
-    // Check if the selected size is in stock
-    const isSizeAvailable = isSizeInStock(selectedSize);
+    // Check if colors are available for this size but none selected
+    if (availableColors.length > 0 && !selectedColor) {
+      toast.error("Please select a color", {
+        description: "You need to select a color for this item.",
+        duration: 3000
+      });
+      return;
+    }
+    
+    // Check if the selected size and color combination is in stock
+    const isSizeAvailable = isSizeInStock(selectedSize, selectedColor);
     if (!isSizeAvailable || isOutOfStock) {
-      toast.error("This size is currently out of stock", {
-        description: "Please select a different size or check back later.",
+      toast.error("This item is currently out of stock", {
+        description: "Please select a different size or color, or check back later.",
         duration: 3000
       });
       return;
     }
 
     // Get size stock quantity
-    const sizeData = sizeAvailability.find((item: SizeAvailability) => item.size === selectedSize);
+    const sizeData = sizeAvailability.find((item: SizeAvailability) => 
+      item.size === selectedSize && (!selectedColor || item.color === selectedColor)
+    );
     const stockQuantity = sizeData?.stock || 0;
     
     // Check existing cart items to prevent over-ordering
-    const cartItemId = `${product.id}-${selectedSize}`;
+    const cartItemId = selectedColor 
+      ? `${product.id}-${selectedSize}-${selectedColor}`
+      : `${product.id}-${selectedSize}`;
     const existingItem = cart.find((item: CartItem) => item.id === cartItemId);
     const currentQuantityInCart = existingItem?.quantity || 0;
     
@@ -176,6 +247,7 @@ export default function ProductDetails() {
           ...product,
           id: cartItemId,
           size: selectedSize,
+          color: selectedColor || undefined, // Include color if selected
           quantity: 1,
         },
       ];
@@ -185,8 +257,12 @@ export default function ProductDetails() {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     
     // Enhanced toast with action button
+    const itemDescription = selectedColor 
+      ? `${product.title} (${selectedSize}, ${selectedColor})` 
+      : `${product.title} (${selectedSize})`;
+      
     toast.success("Product added to cart", {
-      description: `${product.title} (${selectedSize}) added to your shopping cart.`,
+      description: `${itemDescription} added to your shopping cart.`,
       action: {
         label: "View Cart",
         onClick: () => router.push("/cart")
@@ -194,6 +270,8 @@ export default function ProductDetails() {
       duration: 5000 // Show for 5 seconds
     });
   };
+
+
 
   if (!product) {
     return <div className="text-center py-10">Loading...</div>;
@@ -330,24 +408,34 @@ export default function ProductDetails() {
                   <div className="py-1 text-xs text-gray-500">Loading size availability...</div>
                 ) : sizeAvailability.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {sizeAvailability.map((sizeData: SizeAvailability) => {
-                      const inStock = sizeData.stock > 0;
-                      
+                    {/* Show all available sizes without filtering by color */}
+                    {Array.from(new Set(sizeAvailability.map(item => item.size))).map((size) => {
+                      // Check if any variant of this size has stock
+                      const inStock = sizeAvailability.some(
+                        (item: SizeAvailability) => item.size === size && item.stock > 0
+                      );
+                        
                       return (
                         <Button
-                          key={sizeData.size}
-                          variant={selectedSize === sizeData.size ? "default" : "outline"}
+                          key={size}
+                          variant={selectedSize === size ? "default" : "outline"}
                           className={`px-2 py-0.5 sm:px-3 sm:py-1 text-xs ${
-                            selectedSize === sizeData.size
+                            selectedSize === size
                               ? "bg-amber-600 text-white hover:bg-amber-700"
                               : inStock 
                                 ? "hover:bg-gray-100" 
                                 : "opacity-60 cursor-not-allowed bg-gray-100"
                           }`}
-                          onClick={() => !isOutOfStock && inStock && setSelectedSize(sizeData.size)}
+                          onClick={() => {
+                            if (!isOutOfStock && inStock) {
+                              setSelectedSize(size);
+                              // Update available colors for this size
+                              updateAvailableColorsForSize(size);
+                            }
+                          }}
                           disabled={isOutOfStock || !inStock}
                         >
-                          {sizeData.size}
+                          {size}
                         </Button>
                       );
                     })}
@@ -356,6 +444,51 @@ export default function ProductDetails() {
                   <div className="py-1 text-xs text-gray-500">No sizes available for this product</div>
                 )}
               </div>
+              
+              {/* Color Selection - Only display after a size is selected */}
+              {selectedSize && (
+                <div className="space-y-1 py-1">
+                  <h3 className="text-sm font-medium">Select Color</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {availableColors.length > 0 ? (
+                      availableColors.map((color) => {
+                        const isSelected = selectedColor === color;
+                        // Check if this color is available for the selected size
+                        const isInStock = sizeAvailability.some((item) => 
+                          item.size === selectedSize && 
+                          item.color === color && 
+                          item.stock > 0
+                        );
+                        
+                        return (
+                          <Button
+                            key={color}
+                            variant={isSelected ? "default" : "outline"}
+                            className={`px-2 py-0.5 sm:px-3 sm:py-1 text-xs flex items-center gap-1 ${
+                              isSelected
+                                ? "bg-amber-600 text-white hover:bg-amber-700"
+                                : isInStock
+                                  ? "hover:bg-gray-100"
+                                  : "opacity-60 cursor-not-allowed bg-gray-100"
+                            }`}
+                            onClick={() => !isOutOfStock && isInStock && setSelectedColor(color)}
+                            disabled={isOutOfStock || !isInStock}
+                          >
+                            {color}
+                            {isSelected && (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </Button>
+                        );
+                      })
+                    ) : (
+                      <div className="py-1 text-xs text-gray-500">No colors available for this size</div>
+                    )}
+                  </div>
+                </div>
+              )}
               
               <Separator className="my-3" />
               

@@ -47,6 +47,7 @@ interface OrderItem {
     originalPrice: number;
     quantity: number;
     size: string | null;
+    color: string | null;
     image: string[];
     discountPrice: number | null;
   };
@@ -315,6 +316,8 @@ const OrderContent = () => {
                         </div>
                         <div className="text-xs text-gray-500">
                           {item.items.size && `Size: ${item.items.size}`}
+                          {item.items.size && item.items.color && ` • `}
+                          {item.items.color && `Color: ${item.items.color}`}
                         </div>
                       </td>
                       <td className="px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 text-center">
