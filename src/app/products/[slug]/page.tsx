@@ -88,7 +88,7 @@ export default function ProductDetails() {
     
     // Remove duplicates
     const uniqueColors = [...new Set(colorsForSize)];
-    setAvailableColors(uniqueColors);
+    setAvailableColors(uniqueColors as string[]);
     
     // Reset selected color if current selection is not available for this size
     if (uniqueColors.length > 0) {
@@ -142,7 +142,7 @@ export default function ProductDetails() {
                 
                 // Remove duplicates
                 const uniqueColors = [...new Set(colorsForSelectedSize)];
-                setAvailableColors(uniqueColors);
+                setAvailableColors(uniqueColors as string[]);
                 
                 // Do not set a default color - user must choose after size selection
                 setSelectedColor("");

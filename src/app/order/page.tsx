@@ -63,7 +63,7 @@ const OrderLoadingState = () => (
 // Create a separate component that uses useSearchParams
 const OrderContent = () => {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('orderId');
+  const orderId = searchParams?.get('orderId');
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

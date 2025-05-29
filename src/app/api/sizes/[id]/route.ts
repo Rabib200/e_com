@@ -16,7 +16,7 @@ export async function GET(
             );
         }
 
-        console.log("Fetching sizes for product ID:", productId);
+        console.log("Fetching sizes & colors for product ID:", productId);
 
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
