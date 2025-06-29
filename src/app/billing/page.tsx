@@ -8,6 +8,14 @@ import { CartItem } from "@/lib/types";
 import { useRouter } from "next/navigation";
 import { ErrorWithResponse } from "@/lib/errorTemplate";
 import { Copy, Check, CreditCard, ShoppingBag } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ShippingOption {
   id: string;
@@ -18,6 +26,38 @@ interface ShippingOption {
 const shippingOptions: ShippingOption[] = [
   { id: "inside_dhaka", label: "Inside Dhaka", price: 60 },
   { id: "outside_dhaka", label: "Outside Dhaka", price: 120 }
+];
+
+interface PaymentMethod {
+  id: string;
+  label: string;
+  number: string;
+  backgroundColor: string;
+  textColor: string;
+}
+
+const paymentMethods: PaymentMethod[] = [
+  { 
+    id: "bkash", 
+    label: "bKash", 
+    number: "01953965548",
+    backgroundColor: "bg-pink-600",
+    textColor: "text-white"
+  },
+  { 
+    id: "nagad", 
+    label: "Nagad", 
+    number: "01953965548",
+    backgroundColor: "bg-orange-500",
+    textColor: "text-white"
+  },
+  { 
+    id: "rocket", 
+    label: "Rocket", 
+    number: "01953965548",
+    backgroundColor: "bg-purple-600",
+    textColor: "text-white"
+  }
 ];
 
 const BillingPage = () => {
@@ -37,6 +77,11 @@ const BillingPage = () => {
   const [copying, setCopying] = useState(false);
   const [transactionId, setTransactionId] = useState("");
   const [transactionIdError, setTransactionIdError] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [modalPhoneNumber, setModalPhoneNumber] = useState("");
+  const [modalTransactionId, setModalTransactionId] = useState("");
+  const [modalFieldError, setModalFieldError] = useState("");
 
   useEffect(() => {
     try {
@@ -151,9 +196,15 @@ const BillingPage = () => {
       return;
     }
 
+    // Payment method validation
+    if (!selectedPaymentMethod) {
+      alert("Please select a payment method");
+      return;
+    }
+
     // Transaction ID validation
     if (!transactionId.trim()) {
-      setTransactionIdError("Please enter your bKash Transaction ID");
+      setTransactionIdError("Please enter your Transaction ID or Phone Number");
       return;
     }
 
@@ -161,7 +212,8 @@ const BillingPage = () => {
     localStorage.setItem("customerInfo", JSON.stringify({
       ...formData,
       shippingOption: selectedShipping,
-      transactionId: transactionId.trim()
+      transactionId: transactionId.trim(),
+      paymentMethod: selectedPaymentMethod
     }));
 
     try {
@@ -176,7 +228,7 @@ const BillingPage = () => {
             amount: calculateTotal(),
             transactionStatus: "Completed",
             transactionId: transactionId.trim(),
-            paymentMethod: "bkash",
+            paymentMethod: selectedPaymentMethod,
             currency: "BDT",
           },
           customerInfo: {
@@ -229,6 +281,39 @@ const BillingPage = () => {
       .catch(err => {
         console.error('Failed to copy: ', err);
       });
+  };
+
+  const handlePaymentMethodSelect = (method: PaymentMethod) => {
+    setSelectedPaymentMethod(method.id);
+    setIsPaymentModalOpen(true);
+    // Reset modal fields
+    setModalPhoneNumber("");
+    setModalTransactionId("");
+    setModalFieldError("");
+  };
+
+  const handleModalConfirm = () => {
+    // Validate that at least one field is filled
+    if (!modalPhoneNumber.trim() && !modalTransactionId.trim()) {
+      setModalFieldError("Please enter either your phone number or transaction ID");
+      return;
+    }
+
+    // Update the main transactionId field with the provided data
+    const finalValue = modalTransactionId.trim() || modalPhoneNumber.trim();
+    setTransactionId(finalValue);
+    
+    // Close modal
+    setIsPaymentModalOpen(false);
+    setModalFieldError("");
+  };
+
+  const handleModalCancel = () => {
+    setIsPaymentModalOpen(false);
+    setSelectedPaymentMethod("");
+    setModalPhoneNumber("");
+    setModalTransactionId("");
+    setModalFieldError("");
   };
 
   return (
@@ -403,54 +488,168 @@ const BillingPage = () => {
             </Card>
           </div>
 
-          <div className="p-4 border rounded-md mb-4 border-amber-900 bg-amber-600 text-white">
-            <p className="font-medium text-base sm:text-lg mb-2">To confirm your order please pay the shipping charge using bKash/Nagad/Rocket *SEND MONEY*</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-bold text-lg sm:text-xl">01953965548</p>
-              <button 
-                onClick={copyBkashNumber}
-                className="p-1.5 sm:p-2 rounded-md bg-white/20 hover:bg-white/30 transition-colors flex items-center"
-                aria-label="Copy bKash number"
-              >
-                {copying ? (
-                  <>
-                    <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    <span className="text-xs sm:text-sm">Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                    <span className="text-xs sm:text-sm">Copy</span>
-                  </>
-                )}
-              </button>
+          <div className="space-y-4">
+            {/* Payment Method Selection */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">Select Payment Method</h3>
+              <div className="grid grid-cols-1 gap-3">
+                {paymentMethods.map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => handlePaymentMethodSelect(method)}
+                    className={`p-4 border-2 rounded-lg transition-all duration-200 ${
+                      selectedPaymentMethod === method.id
+                        ? `${method.backgroundColor} ${method.textColor} border-transparent`
+                        : `border-gray-300 hover:border-gray-400 bg-white text-gray-700`
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          selectedPaymentMethod === method.id 
+                            ? 'bg-white' 
+                            : 'border-2 border-gray-400'
+                        }`} />
+                        <span className="font-medium text-lg">{method.label}</span>
+                      </div>
+                      <span className="text-sm opacity-90">{method.number}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-            
-            <div className="mt-4">
-              <Label htmlFor="transaction-id" className="text-white text-sm sm:text-base">
-               Transaction ID/ Phone Number *
-              </Label>
-              <div className="flex mt-1">
-                <div className="relative flex-grow">
-                  <CreditCard className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-amber-800" />
-                  <Input
-                    id="transaction-id"
-                    placeholder="Enter your Transaction ID/ Phone Number"
-                    value={transactionId}
-                    onChange={handleTransactionIdChange}
-                    className="pl-8 bg-white/90 text-amber-900 placeholder:text-amber-700/60 border-amber-800"
-                    required
-                  />
+
+            {/* Selected Payment Method Details */}
+            {selectedPaymentMethod && (
+              <div className={`p-4 border rounded-md ${
+                paymentMethods.find(m => m.id === selectedPaymentMethod)?.backgroundColor
+              } ${
+                paymentMethods.find(m => m.id === selectedPaymentMethod)?.textColor
+              }`}>
+                <p className="font-medium text-base sm:text-lg mb-2">
+                  Complete your payment using {paymentMethods.find(m => m.id === selectedPaymentMethod)?.label} *SEND MONEY*
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-bold text-lg sm:text-xl">
+                    {paymentMethods.find(m => m.id === selectedPaymentMethod)?.number}
+                  </p>
+                  <button 
+                    onClick={copyBkashNumber}
+                    className="p-1.5 sm:p-2 rounded-md bg-white/20 hover:bg-white/30 transition-colors flex items-center"
+                    aria-label="Copy payment number"
+                  >
+                    {copying ? (
+                      <>
+                        <Check className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="text-xs sm:text-sm">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="text-xs sm:text-sm">Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                <div className="mt-4">
+                  <Label htmlFor="transaction-id" className="text-white text-sm sm:text-base">
+                   Transaction ID / Phone Number *
+                  </Label>
+                  <div className="flex mt-1">
+                    <div className="relative flex-grow">
+                      <CreditCard className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600" />
+                      <Input
+                        id="transaction-id"
+                        placeholder="Enter your Transaction ID or Phone Number"
+                        value={transactionId}
+                        onChange={handleTransactionIdChange}
+                        className="pl-8 bg-white/90 text-gray-800 placeholder:text-gray-600 border-gray-300"
+                        required
+                      />
+                    </div>
+                  </div>
+                  {transactionIdError && (
+                    <p className="text-xs text-white/80 mt-1">{transactionIdError}</p>
+                  )}
+                  <p className="text-xs text-white/80 mt-1">
+                    After making payment, enter the Transaction ID you received or your phone number.
+                  </p>
                 </div>
               </div>
-              {transactionIdError && (
-                <p className="text-xs text-amber-200 mt-1">{transactionIdError}</p>
-              )}
-              <p className="text-xs text-amber-200 mt-1">
-                After making payment, enter the Transaction ID you received.
-              </p>
-            </div>
+            )}
           </div>
+
+          {/* Payment Modal */}
+          <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedPaymentMethod && 
+                    `Complete ${paymentMethods.find(m => m.id === selectedPaymentMethod)?.label} Payment`
+                  }
+                </DialogTitle>
+                <DialogDescription>
+                  Please send money to the number below and enter your transaction details.
+                </DialogDescription>
+              </DialogHeader>
+              
+              {selectedPaymentMethod && (
+                <div className="space-y-4">
+                  <div className={`p-3 rounded-md ${
+                    paymentMethods.find(m => m.id === selectedPaymentMethod)?.backgroundColor
+                  } ${
+                    paymentMethods.find(m => m.id === selectedPaymentMethod)?.textColor
+                  }`}>
+                    <p className="text-sm font-medium mb-1">Send money to:</p>
+                    <p className="text-lg font-bold">
+                      {paymentMethods.find(m => m.id === selectedPaymentMethod)?.number}
+                    </p>
+                    <p className="text-xs mt-1 opacity-90">
+                      Amount: ৳{formatCurrency(calculateTotal())}
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="modal-phone">Your Phone Number</Label>
+                      <Input
+                        id="modal-phone"
+                        placeholder="Enter your phone number"
+                        value={modalPhoneNumber}
+                        onChange={(e) => setModalPhoneNumber(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="text-center text-sm text-gray-500">OR</div>
+                    
+                    <div>
+                      <Label htmlFor="modal-transaction">Transaction ID</Label>
+                      <Input
+                        id="modal-transaction"
+                        placeholder="Enter transaction ID"
+                        value={modalTransactionId}
+                        onChange={(e) => setModalTransactionId(e.target.value)}
+                      />
+                    </div>
+                    
+                    {modalFieldError && (
+                      <p className="text-sm text-red-600">{modalFieldError}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <DialogFooter className="gap-2">
+                <Button variant="outline" onClick={handleModalCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={handleModalConfirm}>
+                  Confirm Payment
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {isCartEmpty ? (
             <div className="text-center mb-6">
@@ -466,15 +665,15 @@ const BillingPage = () => {
             <Button 
               className="w-full py-2.5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-base sm:text-lg" 
               onClick={handlePlaceOrder}
-              disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !transactionId.trim()}
+              disabled={!formData.fullName || !formData.streetAddress || !formData.city || !formData.phone || !selectedPaymentMethod || !transactionId.trim()}
             >
               Place Order
             </Button>
           )}
           
-          {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || !transactionId.trim()) && (
+          {!isCartEmpty && (formData.fullName === '' || formData.streetAddress === '' || formData.city === '' || formData.phone === '' || !selectedPaymentMethod || !transactionId.trim()) && (
             <p className="text-xs sm:text-sm text-red-500 text-center mt-2">
-              Please fill in all required fields including bKash Transaction ID to place your order
+              Please fill in all required fields, select a payment method, and enter transaction details to place your order
             </p>
           )}
         </div>
